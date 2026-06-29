@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAM ELTIF — Portfolio Intelligence Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Figtree', sans-serif; background: #f5f1ea; color: #1a1a2e; min-height: 100vh; }
+
+  .header { background: #1a1a2e; padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; }
+  .header-label { color: #c9a84c; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .header-title { font-weight: 800; color: white; font-size: 22px; letter-spacing: -0.3px; }
+  .header-sub { color: #888; font-size: 12px; margin-top: 3px; }
+  .header-right { text-align: right; }
+  .header-date { color: #888; font-size: 12px; }
+  .header-edition { color: #c9a84c; font-size: 11px; letter-spacing: 1px; margin-top: 2px; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+  .card { background: white; border-radius: 8px; padding: 24px 28px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+  .tab { padding: 10px 20px; border-radius: 6px; border: 2px solid #e0d8c8; background: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Figtree', sans-serif; color: #888; transition: all 0.2s; }
+  .tab.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+
+  .control-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .control-title { font-weight: 700; font-size: 16px; color: #1a1a2e; margin-bottom: 3px; }
+  .control-sub { font-size: 13px; color: #888; }
+  .progress-bar-wrap { margin-top: 8px; height: 4px; background: #f0ebe0; border-radius: 99px; width: 280px; }
+  .progress-bar-fill { height: 4px; background: #c9a84c; border-radius: 99px; width: 0%; transition: width 0.4s; }
+
+  .btn-genera { background: #c9a84c; color: white; border: none; border-radius: 6px; padding: 12px 28px; font-size: 14px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; font-family: 'Figtree', sans-serif; }
+  .btn-genera:disabled { background: #ccc; cursor: not-allowed; }
+  .btn-secondary { background: white; border: 2px solid #1a1a2e; border-radius: 6px; padding: 10px 22px; font-size: 13px; font-weight: 600; cursor: pointer; color: #1a1a2e; font-family: 'Figtree', sans-serif; }
+  .btn-export { background: #c9a84c; border: none; border-radius: 6px; padding: 10px 22px; font-size: 13px; font-weight: 600; cursor: pointer; color: white; font-family: 'Figtree', sans-serif; }
+  .btn-small { background: #f0ebe0; border: none; border-radius: 4px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; color: #1a1a2e; font-family: 'Figtree', sans-serif; }
+  .btn-save-data { background: #1a1a2e; color: white; border: none; border-radius: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Figtree', sans-serif; }
+
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #f0ebe0; }
+  .section-title { font-weight: 800; font-size: 15px; color: #1a1a2e; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .company-block { border-bottom: 1px solid #f5f1ea; padding-bottom: 14px; }
+  .company-name { font-weight: 700; font-size: 13px; color: #1a1a2e; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .company-sector { font-weight: 400; color: #c9a84c; font-size: 11px; margin-left: 6px; text-transform: none; letter-spacing: 0; }
+
+  .article-title { font-size: 13px; line-height: 1.7; color: #333; margin-bottom: 5px; }
+  .article-meta { font-size: 11px; color: #888; }
+  .article-meta a { color: #c9a84c; text-decoration: none; border-bottom: 1px solid #c9a84c; }
+  .no-article { font-size: 13px; color: #bbb; font-style: italic; }
+
+  .body-line { font-size: 14px; line-height: 1.8; color: #333; margin-bottom: 4px; }
+  .body-bullet { padding-left: 12px; border-left: 2px solid #e8e0d0; }
+  .highlight-box { background: #f8f4ea; border-left: 3px solid #c9a84c; padding: 10px 14px; border-radius: 2px; }
+
+  .empty-state { text-align: center; padding: 64px 32px; }
+  .empty-icon { font-size: 44px; margin-bottom: 14px; }
+  .empty-title { font-weight: 700; font-size: 18px; color: #ccc; margin-bottom: 8px; }
+  .empty-sub { font-size: 13px; color: #bbb; }
+
+  .export-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+  .footer { margin-top: 20px; font-size: 11px; color: #bbb; text-align: center; }
+
+  .banner-warning { background: #fffbf0; border: 2px solid #c9a84c; border-radius: 8px; padding: 20px 24px; margin-bottom: 20px; }
+  .banner-ok { background: #f0faf4; border: 1px solid #4caf80; border-radius: 8px; padding: 10px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .banner-ok span { font-size: 13px; color: #2d7a4f; font-weight: 600; }
+  .key-input-row { display: flex; gap: 10px; margin-top: 12px; }
+  .key-input { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: monospace; outline: none; }
+  .btn-save { background: #c9a84c; color: white; border: none; border-radius: 6px; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Figtree', sans-serif; }
+  .btn-edit { font-size: 11px; color: #888; background: none; border: none; cursor: pointer; text-decoration: underline; font-family: 'Figtree', sans-serif; }
+
+  /* Dati aziende */
+  .company-data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .company-data-card { border: 1px solid #e8e0d0; border-radius: 8px; padding: 16px; }
+  .company-data-name { font-weight: 700; font-size: 13px; color: #1a1a2e; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; }
+  .data-field { margin-bottom: 8px; }
+  .data-label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .data-input { width: 100%; padding: 7px 10px; border: 1px solid #e0d8c8; border-radius: 4px; font-size: 13px; font-family: 'Figtree', sans-serif; outline: none; color: #1a1a2e; background: #fafafa; }
+  .data-input:focus { border-color: #c9a84c; background: white; }
+  .data-updated { font-size: 10px; color: #bbb; margin-top: 4px; }
+  .data-saved-badge { font-size: 10px; color: #4caf80; font-weight: 600; }
+
+  .numeri-display { font-size: 13px; line-height: 1.8; color: #333; }
+  .numeri-display strong { color: #1a1a2e; }
+  .numeri-anno { font-size: 11px; color: #c9a84c; font-weight: 600; margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA4MDkxLjQ0IDExNTEuMzkiPgogIDwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAzMC41LjEsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiAyLjEuNCBCdWlsZCAzKSAgLS0+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5zdDAgewogICAgICAgIGZpbGw6ICNmZmY7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxyZWN0IGNsYXNzPSJzdDAiIHg9IjQ0MjYuNTYiIHdpZHRoPSIxOS42IiBoZWlnaHQ9IjExNTEuMzkiLz4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNTAxOS40MSw0NTMuM2wtNzAuMy0xMjUuMjZoLTEyLjEybC03MS4zOCwxMjUuMjZoMTUzLjhaTTUwNjAuNTMsNTI3LjRsLTI2LjcxLTQ3LjY0aC0xODIuNjNsLTI3LjAyLDQ3LjY0aC0zNC4wNWwxMjguMDEtMjI1LjhoNDguMTRsMTI3LjY5LDIyNS44aC0zMy40MloiLz4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNTEyNi40Nyw0NTYuNzZoMjkuMzFjMCwyLjMzLjA0LDQsLjE3LDQuOTcuNDUsMTIuOTMsMS40MiwyMS41NCwyLjk4LDI1Ljc1LDEuNTQsNC4xNyw0Ljk1LDcuNDcsMTAuMjQsOS44LDguMzgsMy42MiwzNS44MSw1LjQ2LDgyLjIxLDUuNDYsMzguMDMsMCw2Mi4wNy0xLjYzLDcyLjEtNC44MiwxNC42OS00LjYxLDIyLjAxLTE1Ljg1LDIyLjAxLTMzLjY5cy01LjE0LTI4LjY3LTE1LjM2LTMyLjI5Yy01LjYxLTIuMDEtMTMuNTItMy4xNS0yMy41OS0zLjUzLTEwLjE0LS4yNy00My4wMi0uNDktOTguNjMtLjQ5LTM1LjcsMC01OS4zLTcuMjQtNzAuODEtMjEuNzgtNy4yMi05LjA0LTEwLjgxLTIyLjc3LTEwLjgxLTQxLjIyLDAtMjAuNCw1LjY5LTM1LjE1LDE3LjA2LTQ0LjMxLDUuNjEtNC41MywxMS43Mi03Ljk0LDE4LjMxLTEwLjI4LDYuNTgtMi4zMSwxNi4wNC00LjE1LDI4LjI3LTUuNjEsMjAuMS0yLjQ1LDQzLjc4LTMuNjIsNzAuOTgtMy42Miw0Ni44MSwwLDc3LjI4LDUuNzMsOTEuMzUsMTcuMTQsNi40MSw1LjE5LDEwLjc3LDExLjI0LDEzLjEyLDE4LjE2LDIuNDEsNi45NCwzLjcsMTcuNTksMy45MiwzMi4wMmgtMzAuMTN2LTMuNTFjMC0xMC44Ni0xLjE5LTE4LjIyLTMuNjItMjIuMDctNi42NS0xMC44My0zMi4wNC0xNi4yOS03NS45My0xNi4yOS01My45NiwwLTg1LjczLDQuNzYtOTUuMzEsMTQuMjQtNC44Myw0Ljg1LTcuMjQsMTIuODctNy4yNCwyNC4xMiwwLDEwLjE2LDEuMjEsMTcuMzcsMy42NCwyMS42OSwyLjQxLDQuMjcsNy4xMSw3LjU2LDE0LjIsOS43MywxMC4yMiwzLjM2LDI5Ljk2LDUuMSw1OS4xNyw1LjMxLDUuNTIsMCwzMC4wNy4xMSw3My40NS4zMiwxNi4xNy4xNywyOC42MSwxLjY3LDM3LjI0LDQuNjUsOC42MSwyLjk4LDE1Ljc0LDguMTMsMjEuMjIsMTUuNDEsNi44Myw5LjEsMTAuMjIsMjIuMzUsMTAuMjIsMzkuN3MtMi43OSwyOS40OC04LjQyLDM4LjljLTYuNiwxMC45OC0xOS4wNSwxOC4zMy0zNy4zNywyMi4xMS0xOC4yNiwzLjc5LTUxLjExLDUuNjMtOTguNDIsNS42My00My40NywwLTcxLjI5LTMuNDctODMuNTItMTAuNDUtOC4zOC00LjctMTQuMjItMTAuODEtMTcuMzktMTguMTYtMy4xNy03LjMtNC44Mi0xOC4yOC00LjgyLTMyLjg5LDAtLjY0LjA5LTQsLjE3LTEwLjExIi8+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTU0MjIuNTEsNDU2Ljc2aDI5LjI1YzAsMi4zMy4wNCw0LC4xOSw0Ljk3LjQ3LDEyLjkzLDEuNDQsMjEuNTQsMi45NiwyNS43NSwxLjQ4LDQuMTcsNC45NSw3LjQ3LDEwLjI2LDkuOCw4LjQsMy42MiwzNS43OSw1LjQ2LDgyLjE3LDUuNDYsMzguMDksMCw2Mi4xMy0xLjYzLDcyLjE2LTQuODIsMTQuNjYtNC42MSwyMS45OS0xNS44NSwyMS45OS0zMy42OXMtNS4xMi0yOC42Ny0xNS4zOC0zMi4yOWMtNS42MS0yLjAxLTEzLjQ4LTMuMTUtMjMuNi0zLjUzLTEwLjA5LS4yNy00My0uNDktOTguNjMtLjQ5LTM1LjY0LDAtNTkuMjUtNy4yNC03MC44My0yMS43OC03LjE3LTkuMDQtMTAuNjktMjIuNzctMTAuNjktNDEuMjIsMC0yMC40LDUuNjUtMzUuMTUsMTcuMDEtNDQuMzEsNS41OS00LjUzLDExLjctNy45NCwxOC4zLTEwLjI4LDYuNjQtMi4zMSwxNi4wNC00LjE1LDI4LjI5LTUuNjEsMjAuMS0yLjQ1LDQzLjgtMy42Miw3MS0zLjYyLDQ2Ljc3LDAsNzcuMjYsNS43Myw5MS4zMywxNy4xNCw2LjQzLDUuMTksMTAuNzksMTEuMjQsMTMuMSwxOC4xNiwyLjQxLDYuOTQsMy43MiwxNy41OSwzLjkyLDMyLjAyaC0zMC4xM3YtMy41MWMwLTEwLjg2LTEuMTYtMTguMjItMy42NC0yMi4wNy02LjY1LTEwLjgzLTMyLTE2LjI5LTc1LjkxLTE2LjI5LTUzLjkyLDAtODUuNzEsNC43Ni05NS4yNywxNC4yNC00Ljg3LDQuODUtNy4yMiwxMi44Ny03LjIyLDI0LjEyLDAsMTAuMTYsMS4xNiwxNy4zNywzLjYsMjEuNjksMi40Myw0LjI3LDcuMTUsNy41NiwxNC4yMiw5LjczLDEwLjIyLDMuMzYsMjkuOTQsNS4xLDU5LjExLDUuMzEsNS42MSwwLDMwLjA5LjExLDczLjQ3LjMyLDE2LjIxLjE3LDI4LjYxLDEuNjcsMzcuMjQsNC42NSw4LjY1LDIuOTgsMTUuNzYsOC4xMywyMS4yMywxNS40MSw2LjgzLDkuMSwxMC4yOCwyMi4zNSwxMC4yOCwzOS43cy0yLjgyLDI5LjQ4LTguNDYsMzguOWMtNi42LDEwLjk4LTE5LjA3LDE4LjMzLTM3LjM5LDIyLjExLTE4LjMzLDMuNzktNTEuMTMsNS42My05OC40LDUuNjMtNDMuNDksMC03MS4zMS0zLjQ3LTgzLjUzLTEwLjQ1LTguMzYtNC43LTE0LjE4LTEwLjgxLTE3LjM3LTE4LjE2LTMuMTctNy4zLTQuNzgtMTguMjgtNC43OC0zMi44OSwwLS42NC4wMi00LC4xNS0xMC4xMSIvPgogIDxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNTcyNC43OCA1MjcuNCA1NzI0Ljc4IDMwMS41OSA1OTQ2LjA3IDMwMS41OSA1OTQ2LjA3IDMyOC4wNCA1NzU0LjkgMzI4LjA0IDU3NTQuOSAzOTcgNTkzOC4wMSAzOTcgNTkzOC4wMSA0MjMuNSA1NzU0LjkgNDIzLjUgNTc1NC45IDUwMC44OSA1OTQ2LjI2IDUwMC44OSA1OTQ2LjI2IDUyNy40IDU3MjQuNzggNTI3LjQiLz4KICA8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjU5NzYuMjcgMzAxLjU4IDYyMzIuODcgMzAxLjU4IDYyMzIuODcgMzI4LjAzIDYxMTkuODcgMzI4LjAzIDYxMTkuODcgNTI3LjM5IDYwODkuNzggNTI3LjM5IDYwODkuNzggMzI4LjAzIDU5NzYuMjcgMzI4LjAzIDU5NzYuMjcgMzAxLjU4Ii8+CiAgPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI0ODEwLjMzIDcwOC4xIDQ4NzAuNDUgNzA4LjEgNDk5My4wNiA4OTkuNTEgNTExMy42NCA3MDguMSA1MTc0LjE4IDcwOC4xIDUxNzQuMTggOTMzLjk2IDUxNDQuMDkgOTMzLjk2IDUxNDQuMDkgNzM2LjA2IDUxMzEuNTYgNzM2LjA2IDUwMDUuNDggOTMzLjk2IDQ5ODEuMDIgOTMzLjk2IDQ4NTMuNjUgNzM2LjA2IDQ4NDAuNDIgNzM2LjA2IDQ4NDAuNDIgOTMzLjk2IDQ4MTAuMzMgOTMzLjk2IDQ4MTAuMzMgNzA4LjEiLz4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNTQ0Mi4zOSw4NTkuODJsLTcwLjI2LTEyNS4yM2gtMTIuMDZsLTcxLjQyLDEyNS4yM2gxNTMuNzRaTTU0ODMuNTcsOTMzLjk3bC0yNi43NS00Ny42NmgtMTgyLjU2bC0yNy4wNSw0Ny42NmgtMzQuMDNsMTI3Ljk5LTIyNS44Nmg0OC4xNGwxMjcuNjksMjI1Ljg2aC0zMy40MloiLz4KICA8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjU1NTUuODEgNzA4LjEgNTYwNS44NiA3MDguMSA1ODAzLjc0IDkwNi4xNyA1ODEwLjY5IDkwNi4xNyA1ODEwLjY5IDcwOC4xIDU4NDAuNzggNzA4LjEgNTg0MC43OCA5MzMuOTYgNTc4OS45IDkzMy45NiA1NTkyLjUxIDczNi40NCA1NTg1LjkxIDczNi40NCA1NTg1LjkxIDkzMy45NiA1NTU1LjgxIDkzMy45NiA1NTU1LjgxIDcwOC4xIi8+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTYxMTMuOTgsODU5LjgybC03MC4yMi0xMjUuMjNoLTEyLjE3bC03MS4zNiwxMjUuMjNoMTUzLjc2Wk02MTU1LjE0LDkzMy45N2wtMjYuNzctNDcuNjZoLTE4Mi42bC0yNy4wMiw0Ny42NmgtMzQuMDFsMTI4LjAxLTIyNS44Nmg0OC4xMmwxMjcuNjcsMjI1Ljg2aC0zMy40MVoiLz4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNjM0Ni4xNSw4MTkuNDZoMTQ4LjAxYy0uMTcsMzUtMS4zNiw1Ny43MS0zLjQ3LDY4LjE0LTIuMzUsMTEuNTgtNS45NSwyMC4zNC0xMC45MiwyNi4xOC00Ljk1LDUuODQtMTIuNTUsMTAuNDUtMjIuODMsMTMuOS0xMy43OCw0LjQ5LTQ1LjAzLDYuNzctOTMuNzUsNi43Ny00Ni4wMywwLTc4LjM4LTEuNDYtOTcuMTMtNC40NC0xNi41MS0yLjY1LTI4LjQ2LTkuODQtMzUuODUtMjEuNTgtOC4yNy0xMy4xLTEyLjQtNDIuMjQtMTIuNC04Ny4yOSwwLTMzLjg2LDIuMDUtNTcuODgsNi4yNC03Mi4wMSw1LjMxLTE3LjczLDE1LjcyLTI5LjEsMzEuMjgtMzQuMDcsMTYuMDYtNS4xNCw0Ny44Mi03Ljc5LDk1LjA4LTcuNzksNDIuMjQsMCw3Mi45LDEuMzcsOTIuMDEsNCwxNC41MiwxLjk1LDI2LjI4LDcuNTMsMzUuMjEsMTYuNzIsOS42MSw5Ljc4LDE0LjU4LDI2LjcxLDE1LjA3LDUwLjc5aC0zMS4xM2MtLjMyLTE3LjY5LTIuNzctMjguNjctNy4yMi0zMy4xLTUuMDItNC45OS0xNy44Mi04LjE3LTM4LjQzLTkuNjMtMTUuNTMtMS4wOC0zNS42NC0xLjY3LTYwLjM1LTEuNjctMzEuNjQsMC01NC40NS44NS02OC4zMSwyLjU0LTEzLjkyLDEuNjctMjMuMTMsNC42NC0yNy42Miw4LjkxLTcuNDMsNy4wMy0xMS4wOSwzMC43My0xMS4wOSw3MC45NiwwLDM0LjI0LDEuMzYsNTYuNDIsNC4xMSw2Ni43LDMuMTMsMTEuMzYsMTEuNDcsMTguMTEsMjUuMTgsMjAuMzIsMTQuNjksMi4zMyw0Ni45OCwzLjQ3LDk2LjksMy40NywyOC4xNSwwLDQ3LjgyLS45Nyw1OS4wNi0yLjgxLDEzLjI1LTIuMzMsMjEuNDgtNi44MywyNC43Mi0xMy40OCwzLjI2LTYuNjksNS4wOC0yMS42OSw1LjM4LTQ1LjFoLTExNy43NnYtMjYuNDVaIi8+CiAgPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI2NTQ3LjcgOTMzLjk3IDY1NDcuNyA3MDguMTEgNjc2OC45OSA3MDguMTEgNjc2OC45OSA3MzQuNTkgNjU3Ny43NyA3MzQuNTkgNjU3Ny43NyA4MDMuNjMgNjc2MC45NCA4MDMuNjMgNjc2MC45NCA4MzAuMDcgNjU3Ny43NyA4MzAuMDcgNjU3Ny43NyA5MDcuNDcgNjc2OS4xNiA5MDcuNDcgNjc2OS4xNiA5MzMuOTcgNjU0Ny43IDkzMy45NyIvPgogIDxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNjgxNi4wOCA3MDguMSA2ODc2LjI4IDcwOC4xIDY5OTguODUgODk5LjUxIDcxMTkuMzkgNzA4LjEgNzE3OS45NyA3MDguMSA3MTc5Ljk3IDkzMy45NiA3MTQ5Ljg2IDkzMy45NiA3MTQ5Ljg2IDczNi4wNiA3MTM3LjMxIDczNi4wNiA3MDExLjIzIDkzMy45NiA2OTg2Ljc1IDkzMy45NiA2ODU5LjQyIDczNi4wNiA2ODQ2LjE5IDczNi4wNiA2ODQ2LjE5IDkzMy45NiA2ODE2LjA4IDkzMy45NiA2ODE2LjA4IDcwOC4xIi8+CiAgPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI3MjM5LjEyIDkzMy45NyA3MjM5LjEyIDcwOC4xMSA3NDYwLjQ1IDcwOC4xMSA3NDYwLjQ1IDczNC41OSA3MjY5LjIzIDczNC41OSA3MjY5LjIzIDgwMy42MyA3NDUyLjMgODAzLjYzIDc0NTIuMyA4MzAuMDcgNzI2OS4yMyA4MzAuMDcgNzI2OS4yMyA5MDcuNDcgNzQ2MC42IDkwNy40NyA3NDYwLjYgOTMzLjk3IDcyMzkuMTIgOTMzLjk3Ii8+CiAgPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI3NTA3LjQ3IDcwOC4xIDc1NTcuNTggNzA4LjEgNzc1NS40IDkwNi4xNyA3NzYyLjQ0IDkwNi4xNyA3NzYyLjQ0IDcwOC4xIDc3OTIuNTQgNzA4LjEgNzc5Mi41NCA5MzMuOTYgNzc0MS41MiA5MzMuOTYgNzU0NC4yMSA3MzYuNDQgNzUzNy42IDczNi40NCA3NTM3LjYgOTMzLjk2IDc1MDcuNDcgOTMzLjk2IDc1MDcuNDcgNzA4LjEiLz4KICA8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9Ijc4MzQuOTQgNzA4LjExIDc4MzQuOTQgNzM0LjYxIDc5NDguMzggNzM0LjYxIDc5NDguMzggOTMzLjk3IDc5NzguNDggOTMzLjk3IDc5NzguNDggNzM0LjYxIDgwOTEuNDQgNzM0LjYxIDgwOTEuNDQgNzA4LjExIDc4MzQuOTQgNzA4LjExIi8+CiAgPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSI0MDEuODkgMjg0LjEyIDgyNy4wMSAyODQuMTIgODI3LjAxIDM3MC43IDUxMS4wOSAzNzAuNyA1MTEuMDkgNTMwLjA1IDgwOS44NyA1MzAuMDUgODA5Ljg3IDYxNi42NCA1MTEuMDkgNjE2LjY0IDUxMS4wOSA4NjEuNzEgNDAxLjg5IDg2MS43MSA0MDEuODkgMjg0LjEyIi8+CiAgPHJlY3QgY2xhc3M9InN0MCIgeD0iOTQ2LjIzIiB5PSIyODQuMSIgd2lkdGg9IjEwOS4xNyIgaGVpZ2h0PSI1NzcuNTkiLz4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTE5NC40NSw4NjEuNzFWMjg0LjExaDEzNS4yMmwxNzkuMDUsMjQ3LjY2YzQ2LjM0LDY0LjMxLDg2LjQ1LDEzMS4xLDExOC4zNCwxOTMuNjloMi4wM2MtOC4yNy03Ny4wMy0xMS4yOC0xNTEuNjUtMTEuMjgtMjM5Ljg3di0yMDEuNDhoMTA4LjM5djU3Ny41OWgtMTIxLjc0bC0xODEuMTctMjUzLjYyYy00NC4yMS02My40NC05MC41MS0xMzQuNS0xMjQuNTEtMTk5LjY4bC0zLjA3Ljg1YzUuMTIsNzQuNTksNi4wNywxNTAuNzQsNi4wNywyNDUuODh2MjA2LjU2aC0xMDcuMzNaIi8+CiAgPHBvbHlnb24gY2xhc3M9InN0MCIgcG9pbnRzPSIyMjYwLjQxIDYxNy42MSAxOTYxLjYzIDYxNy42MSAxOTYxLjYzIDc3Ni4xNSAyMjc3LjU5IDc3NS4wMSAyMjc3LjU5IDg2Mi42OCAxODUyLjQzIDg2Mi42OCAxODUyLjQzIDI4NC45NyAyMjc3LjU5IDI4NC45NyAyMjc3LjU5IDM3MS42NyAxOTYxLjYzIDM3MS42NyAxOTYxLjYzIDUzMC44NiAyMjYwLjQxIDUzMC44NiAyMjYwLjQxIDYxNy42MSIvPgogIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0zMzExLjkyLDc4My4wNWMtMTI2LjM0LDAtMjI4Ljc2LTY2LjQ3LTIyOC43Ni0yMTEuMTVzMTAyLjQyLTIxMS4wOSwyMjguNzYtMjExLjA5LDIyOC42Myw5NC40OSwyMjguNjMsMjExLjA5LTEwMi4zNiwyMTEuMTUtMjI4LjYzLDIxMS4xNU0zMzExLjkyLDI3Mi41NGMtMTg2LjYzLDAtMzM3LjkxLDExMi41LTMzNy45MSwyOTkuMzdzMTUxLjI4LDI5OS40MiwzMzcuOTEsMjk5LjQyLDMzNy44LTEzNC4wOCwzMzcuOC0yOTkuNDItMTUxLjI2LTI5OS4zNy0zMzcuOC0yOTkuMzciLz4KICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjg4OS4zOSw3NjEuNTljLTM5LjA2LDEzLjU3LTgyLjk1LDIxLjItMTI5LjQyLDIxLjItMTYzLjAzLDAtMjk1LjItNjYuMDktMjk1LjItMjA5LjlzMTMyLjE3LTIwOS45MiwyOTUuMi0yMDkuOTJjNDcuNTcsMCw5Mi41LDguMDYsMTMyLjMsMjIuM2wyNi4zMi04Ny44NGMtNDguNzMtMTUuNDMtMTAyLjM0LTIzLjk2LTE1OC42MS0yMy45Ni0yMjMuMzIsMC00MDQuMzQsMTEyLjYtNDA0LjM0LDI5OS40MiwwLDIwNS43NSwxNTUuNSwyOTkuNDIsNDA0LjM0LDI5OS40Miw1NS4yMywwLDEwNy43NS04LjIzLDE1NS42OS0yMy4wNGwtMjYuMjgtODcuNjlaIi8+CiAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTMwNi4zOCw1My44MmMtMTQwLjUxLDAtMjU0LjgxLDExNC4zNC0yNTQuODEsMjU0Ljg1djUyOS44M2MwLDE0MC41MywxMTQuMzEsMjU0Ljg1LDI1NC44MSwyNTQuODVoMzM4Ny42YzE0MC40OSwwLDI1NC44MS0xMTQuMzIsMjU0LjgxLTI1NC44NVYzMDguNjdjMC0xNDAuNTEtMTE0LjMyLTI1NC44NS0yNTQuODEtMjU0Ljg1SDMwNi4zOFpNMzY5My45OCwxMTQ0Ljk2SDMwNi4zOEMxMzcuNCwxMTQ0Ljk2LDAsMTAwNy40NywwLDgzOC41VjMwOC42N0MwLDEzOS43LDEzNy40LDIuMjEsMzA2LjM4LDIuMjFoMzM4Ny42YzE2OC45NSwwLDMwNi4zNCwxMzcuNDksMzA2LjM0LDMwNi40NnY1MjkuODNjMCwxNjguOTYtMTM3LjQsMzA2LjQ2LTMwNi4zNCwzMDYuNDYiLz4KPC9zdmc+" alt="Fineco Asset Management" style="height:36px;margin-bottom:6px;" />
+    <div class="header-title">FAM ELTIF Private Equity Fund</div>
+    <div class="header-sub">Rassegna stampa e Spunti commerciali delle aziende in portafoglio</div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="headerDate"></div>
+    <div class="header-edition">Edizione Bisettimanale</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- API Key banner -->
+  <div class="banner-warning" id="bannerWarning">
+    <div style="font-weight:700;font-size:14px;color:#1a1a2e;margin-bottom:4px;">🔑 Inserisci la tua chiave SerpAPI</div>
+    <div style="font-size:12px;color:#888;">Trovala su <a href="https://serpapi.com/manage-api-key" target="_blank" style="color:#c9a84c;">serpapi.com/manage-api-key</a></div>
+    <div class="key-input-row">
+      <input type="text" class="key-input" id="keyInput" placeholder="Incolla qui la tua chiave SerpAPI..." />
+      <button class="btn-save" onclick="saveKey()">Salva</button>
+    </div>
+  </div>
+  <div class="banner-ok" id="bannerOk" style="display:none;">
+    <span>✓ SerpAPI configurata — Google News in italiano attivo</span>
+    <button class="btn-edit" onclick="editKey()">Modifica</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" id="tab-genera" onclick="switchTab('genera')">✦ Genera Documento</button>
+    <button class="tab" id="tab-dati" onclick="switchTab('dati')">📊 Dati Aziende</button>
+  </div>
+
+  <!-- TAB: GENERA -->
+  <div id="view-genera">
+    <div class="card control-bar">
+      <div>
+        <div class="control-title" id="controlTitle">68 aziende in portafoglio</div>
+        <div class="control-sub" id="controlSub">Premi Genera per selezionare 6 aziende e produrre il documento</div>
+        <div class="progress-bar-wrap" id="progressWrap" style="display:none;">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <button class="btn-genera" id="btnGenera" onclick="genera()">✦ Genera Documento</button>
+    </div>
+    <div id="contentArea">
+      <div class="card empty-state">
+        <div class="empty-icon">✦</div>
+        <div class="empty-title">Il documento apparirà qui</div>
+        <div class="empty-sub">Verranno selezionate 6 aziende su 10 e generate le tre sezioni del report</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: DATI AZIENDE -->
+  <div id="view-dati" style="display:none;">
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">📊 Dati Aziende in Portafoglio</div>
+      </div>
+      <p style="font-size:13px;color:#888;margin-bottom:20px;">Inserisci i dati aggiornati per ogni azienda. Vengono salvati automaticamente e usati nella sezione "Numeri che Fanno Parlare" del documento generato.</p>
+      <div class="company-data-grid" id="companyDataGrid"></div>
+      <div style="margin-top:20px;display:flex;gap:12px;align-items:center;">
+        <button class="btn-save-data" onclick="saveAllData()">💾 Salva tutti i dati</button>
+        <span id="saveStatus" style="font-size:12px;color:#4caf80;font-weight:600;"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">🕓 Cronologia Edizioni</div>
+      </div>
+      <p style="font-size:13px;color:#888;margin-bottom:16px;">Il tool ricorda gli articoli e le curiosità già usate nelle ultime edizioni per non ripeterle. <span id="historyCount"></span></p>
+      <button class="btn-secondary" onclick="resetHistory()">🗑 Azzera cronologia</button>
+    </div>
+  </div>
+
+  <div class="footer">Documento riservato — Fineco Asset Management · Uso interno</div>
+</div>
+
+<script>
+const COMPANIES = [
+  // Top holdings
+  { id: "action", name: "Action", sector: "Retail non-food discount", country: "Paesi Bassi", query: "Action negozi retail discount Europa" },
+  { id: "ryan", name: "Ryan", sector: "Recupero fiscale e servizi tributari globali", country: "USA", query: "Ryan LLC tax services" },
+  { id: "nordanglia", name: "Nord Anglia", sector: "Istruzione privata internazionale", country: "Regno Unito", query: "Nord Anglia Education schools" },
+  { id: "solenis", name: "Solenis", sector: "Chimica specialistica per processi industriali", country: "USA", query: "Solenis chemical water treatment" },
+  { id: "proofpoint", name: "Proofpoint", sector: "Cybersecurity e protezione email", country: "USA", query: "Proofpoint cybersecurity email security" },
+  { id: "mavistire", name: "Mavis Tire Express Services", sector: "Servizi auto e pneumatici", country: "USA", query: "Mavis Tire Express Services automotive" },
+  { id: "veeam", name: "Veeam", sector: "Software backup e data recovery", country: "USA", query: "Veeam Software backup data recovery" },
+  { id: "proampac", name: "ProAmpac", sector: "Packaging flessibile", country: "USA", query: "ProAmpac flexible packaging" },
+  { id: "truepotential", name: "True Potential", sector: "Servizi finanziari e wealth management", country: "Regno Unito", query: "True Potential wealth management UK" },
+  { id: "bendingspoons", name: "Bending Spoons", sector: "App mobile e software consumer", country: "Italia", query: "Bending Spoons app software Milano" },
+  { id: "agilitihealth", name: "Agiliti Health", sector: "Attrezzature medicali e healthcare services", country: "USA", query: "Agiliti Health medical equipment services" },
+  { id: "identitydigital", name: "Identity Digital", sector: "Gestione domini internet e infrastruttura digitale", country: "USA", query: "Identity Digital domain registry" },
+  { id: "cegid", name: "Cegid", sector: "Software gestionale ERP per PMI", country: "Francia", query: "Cegid software ERP France" },
+  { id: "spectris", name: "Spectris", sector: "Strumenti di misurazione e tecnologia industriale", country: "Regno Unito", query: "Spectris measurement technology" },
+  { id: "brooksautomation", name: "Brooks Automation", sector: "Automazione industriale e semiconduttori", country: "USA", query: "Brooks Automation semiconductor automation" },
+  { id: "ublox", name: "U-blox", sector: "Moduli di posizionamento GPS e comunicazione wireless", country: "Svizzera", query: "U-blox GPS positioning wireless" },
+  { id: "colibrigroup", name: "Colibri Group", sector: "Formazione professionale e licensing", country: "USA", query: "Colibri Group professional education licensing" },
+  { id: "mantech", name: "ManTech International", sector: "Tecnologia e servizi per la difesa USA", country: "USA", query: "ManTech International defense technology" },
+  { id: "conservice", name: "Conservice", sector: "Gestione utenze per proprietà immobiliari", country: "USA", query: "Conservice utility management" },
+  { id: "globalhealthexchange", name: "Global Health Exchange", sector: "Supply chain healthcare", country: "USA", query: "Global Health Exchange GHX healthcare supply chain" },
+  { id: "keystone", name: "Keystone", sector: "Servizi industriali", country: "USA", query: "Keystone industrial services" },
+  { id: "infragroup", name: "Infra Group", sector: "Servizi alle imprese", country: "Europa", query: "Infra Group business services" },
+  { id: "marinerwealthadvisors", name: "Mariner Wealth Advisors", sector: "Gestione patrimoniale e consulenza finanziaria", country: "USA", query: "Mariner Wealth Advisors financial advisory" },
+  { id: "precisionaviationgroup", name: "Precision Aviation Group", sector: "Manutenzione e riparazione aeronautica", country: "USA", query: "Precision Aviation Group maintenance repair" },
+  { id: "agn", name: "AGN", sector: "Servizi industriali", country: "Europa", query: "AGN industrial services" },
+  { id: "ifs", name: "IFS", sector: "Software ERP per settori industriali e aerospace", country: "Svezia", query: "IFS software ERP aerospace industrial" },
+  { id: "modernizingmedicine", name: "Modernizing Medicine", sector: "Software clinico per specialisti medici", country: "USA", query: "Modernizing Medicine EHR clinical software" },
+  { id: "kabafusion", name: "KabaFusion", sector: "Terapie infusionali domiciliari", country: "USA", query: "KabaFusion home infusion therapy" },
+  { id: "ardonoghgroup", name: "The Ardonagh Group", sector: "Brokeraggio assicurativo", country: "Regno Unito", query: "Ardonagh Group insurance brokerage" },
+  { id: "rubix", name: "Rubix", sector: "Distribuzione industriale di componenti MRO", country: "Europa", query: "Rubix industrial distribution MRO" },
+  { id: "zuto", name: "Zuto", sector: "Finanziamento auto online", country: "Regno Unito", query: "Zuto car finance UK" },
+  { id: "vinted", name: "Vinted", sector: "Marketplace second-hand abbigliamento", country: "Lituania", query: "Vinted second hand fashion marketplace" },
+  { id: "hargreaveslansdown", name: "Hargreaves Lansdown", sector: "Piattaforma di investimento retail UK", country: "Regno Unito", query: "Hargreaves Lansdown investment platform UK" },
+  { id: "accountor", name: "Accountor", sector: "Software e servizi contabili per PMI", country: "Finlandia", query: "Accountor accounting software services" },
+  { id: "metronetfiber", name: "MetroNet Fiber", sector: "Infrastruttura fibra ottica residenziale", country: "USA", query: "MetroNet Fiber broadband internet" },
+  { id: "motelone", name: "Motel One", sector: "Catena alberghiera budget-design", country: "Germania", query: "Motel One hotel chain" },
+  { id: "yellowstonelandscape", name: "Yellowstone Landscape", sector: "Servizi di paesaggistica commerciale", country: "USA", query: "Yellowstone Landscape commercial landscaping" },
+  { id: "varsitybrands", name: "Varsity Brands", sector: "Abbigliamento e attrezzature per sport scolastici", country: "USA", query: "Varsity Brands school sports apparel" },
+  { id: "omnia", name: "OMNIA Partners", sector: "Group purchasing organization B2B", country: "USA", query: "OMNIA Partners group purchasing" },
+  { id: "anticimex", name: "Anticimex", sector: "Servizi di disinfestazione e pest control", country: "Svezia", query: "Anticimex pest control services" },
+  { id: "savory", name: "Savory Solutions Group", sector: "Ingredienti e aromi per food industry", country: "Europa", query: "Savory Solutions Group food ingredients" },
+  { id: "benecon", name: "Benecon", sector: "Soluzioni assicurative sanitarie per PMI", country: "USA", query: "Benecon health insurance small business" },
+  { id: "avetta", name: "Avetta", sector: "Gestione supply chain e compliance fornitori", country: "USA", query: "Avetta supply chain compliance" },
+  { id: "rehlko", name: "Rehlko", sector: "Generatori di energia e sistemi di backup", country: "USA", query: "Rehlko power generation backup energy" },
+  { id: "maxar", name: "Maxar Technologies", sector: "Satelliti e imaging geospaziale", country: "USA", query: "Maxar Technologies satellite imaging" },
+  { id: "upower", name: "U-Power", sector: "Calzature e abbigliamento da lavoro", country: "Italia", query: "U-Power calzature sicurezza lavoro" },
+  { id: "hsi", name: "HSI", sector: "Software sicurezza sul lavoro e EHS", country: "USA", query: "HSI safety training software EHS" },
+  { id: "sphera", name: "Sphera", sector: "Software ESG e gestione rischi operativi", country: "USA", query: "Sphera ESG risk management software" },
+  { id: "classiccollision", name: "Classic Collision", sector: "Carrozzerie e riparazione auto", country: "USA", query: "Classic Collision auto body repair" },
+  { id: "rimes", name: "Rimes", sector: "Dati finanziari e benchmark management", country: "USA", query: "Rimes financial data benchmark" },
+  { id: "syneoshealth", name: "Syneos Health", sector: "CRO e biopharmaceutical solutions", country: "USA", query: "Syneos Health clinical research biopharmaceutical" },
+  { id: "everfox", name: "Everfox", sector: "Cybersecurity per infrastrutture critiche", country: "USA", query: "Everfox Forcepoint cybersecurity critical infrastructure" },
+  { id: "houghtonmifflin", name: "Houghton Mifflin Harcourt", sector: "Editoria educativa e soluzioni digitali", country: "USA", query: "Houghton Mifflin Harcourt education publishing" },
+  { id: "autocirc", name: "Autocirc", sector: "Ricambi auto usati e economia circolare", country: "Svezia", query: "Autocirc used car parts circular economy" },
+  { id: "educagroup", name: "Educa Group", sector: "Istruzione privata e early childhood education", country: "Finlandia", query: "Educa Group early childhood education" },
+  { id: "netwrix", name: "Netwrix", sector: "Cybersecurity e data security", country: "USA", query: "Netwrix data security cybersecurity" },
+  { id: "woodmackenzie", name: "Wood MacKenzie", sector: "Analisi e ricerche su energia e risorse naturali", country: "Regno Unito", query: "Wood MacKenzie energy research analytics" },
+  { id: "enstar", name: "Enstar Group", sector: "Run-off assicurativo e gestione sinistri", country: "Bermuda", query: "Enstar Group insurance run-off" },
+  { id: "nthdegree", name: "Nth Degree", sector: "Servizi per eventi e fiere", country: "USA", query: "Nth Degree events exhibitions marketing services" },
+  { id: "fdhaero", name: "FDH Aero", sector: "Distribuzione componenti aeronautici", country: "USA", query: "FDH Aero aerospace components fasteners" },
+  { id: "newforma", name: "Newforma", sector: "Software gestione progetti edilizia", country: "USA", query: "Newforma project information management construction" },
+  { id: "zeus", name: "Zeus", sector: "Polimeri avanzati e dispositivi medici", country: "USA", query: "Zeus polymer medical tubing advanced materials" },
+  { id: "uslbm", name: "US LBM", sector: "Distribuzione materiali edili", country: "USA", query: "US LBM building materials distribution" },
+  { id: "standish", name: "Standish Management", sector: "Amministrazione fondi e limited partnership", country: "USA", query: "Standish Management fund administration" },
+  { id: "amplifi", name: "ampliFI Loyalty Solutions", sector: "Programmi fedeltà per banche e fintech", country: "USA", query: "ampliFI Loyalty Solutions banking rewards" },
+  { id: "integratedpower", name: "Integrated Power Services", sector: "Servizi di riparazione motori e trasformatori", country: "USA", query: "Integrated Power Services motor repair electrical" },
+  { id: "berrypalmerlyle", name: "Berry Palmer & Lyle", sector: "Servizi finanziari specialistici", country: "UK/Global", query: "Berry Palmer Lyle financial services" },
+  { id: "fifty5blue", name: "Fifty5Blue (Kantar Media)", sector: "Misurazione audience e media intelligence", country: "UK/Global", query: "Kantar Media audience measurement media" },
+];
+
+const WORKER_URL = "https://sweet-scene-d35e.stefania-salvini90.workers.dev";
+let serpApiKey = localStorage.getItem("serpApiKey") || "";
+const DEFAULT_COMPANY_DATA = {
+  action: { fatturato: "€13,8 miliardi (2024)", crescita: "+21,7% anno su anno (2024)", presenza: "3.100+ negozi in 14 paesi europei", dipendenti: "79.681 dipendenti in 151 nazionalità", updated: "29/06/2026" },
+  upower: { fatturato: "€300+ milioni (2024)", crescita: "Da €40M a €300M in 5 anni; +doppia cifra prevista 2025", presenza: "8.000+ rivenditori in Italia, Francia, Spagna, Germania, UK", dipendenti: "5.000+ nel Gruppo", updated: "29/06/2026" },
+  ryan: { fatturato: "~$715 milioni (2021); stime correnti $1-5 miliardi", crescita: "50+ acquisizioni; espansione continua in 60+ paesi", presenza: "60+ paesi, 18.000 clienti aziendali", dipendenti: "~4.000 professionisti", updated: "29/06/2026" },
+  nordanglia: { fatturato: "£1,35 miliardi (2023); valutazione $14,5 miliardi (2025)", crescita: "Da 6 scuole a 80+ in 33 paesi", presenza: "80+ scuole in 33 paesi; 90.000+ studenti", dipendenti: "10.981 dipendenti", updated: "29/06/2026" },
+  solenis: { fatturato: "~$2,8 miliardi (2025)", crescita: "Acquisizione Diversey (2023) e NCH Corporation (2025)", presenza: "78 stabilimenti produttivi in 160 paesi su 6 continenti", dipendenti: "~23.000 professionisti", updated: "29/06/2026" },
+  proofpoint: { fatturato: "$2,45 miliardi ARR (fine 2025)", crescita: "+mid-teens% annuo; retention clienti >90%", presenza: "N°1 mondiale Secure Email Gateway; presente in oltre 100 paesi", dipendenti: "~5.000 dipendenti", updated: "29/06/2026" },
+  mavistire: { fatturato: "Non divulgato (società privata)", crescita: "67 nuovi store aperti nel 2024; ulteriori 19 nel 2025", presenza: "3.500+ punti vendita in 49 stati USA e Canada", dipendenti: "23.000+ dipendenti", updated: "29/06/2026" },
+  veeam: { fatturato: "$1,7 miliardi stimati (2025)", crescita: "Acquisizione Securiti AI per $1,73 miliardi (ottobre 2025)", presenza: "400.000+ clienti in 30+ paesi", dipendenti: "~5.300 dipendenti (2026)", updated: "29/06/2026" },
+  proampac: { fatturato: "$1,9 miliardi (2025)", crescita: "Acquisizione TC Transcontinental Packaging per $1,51 miliardi (2025)", presenza: "80 stabilimenti produttivi globali", dipendenti: "11.000+ dipendenti", updated: "29/06/2026" },
+  bendingspoons: { fatturato: "€1,3 miliardi (2025)", crescita: "Da startup a €1,3 miliardi in meno di 10 anni; EBITDA margin >50%", presenza: "App usate in tutto il mondo; sede a Milano + full remote", dipendenti: "~1.000 dipendenti (2025)", updated: "29/06/2026" },
+  truepotential: { fatturato: "£173 milioni ricavi (2024)", crescita: "+18% ricavi YoY; £33 miliardi AUM (2024)", presenza: "Un quinto dei consulenti finanziari UK; Newcastle, Inghilterra", dipendenti: "N/D", updated: "29/06/2026" },
+  agilitihealth: { fatturato: "$1,2 miliardi (2024)", crescita: "Espansione in oncologia e nuova linea letti ospedalieri (2025)", presenza: "10.000+ ospedali e centri sanitari in USA", dipendenti: "5.800 dipendenti", updated: "29/06/2026" },
+  identitydigital: { fatturato: "$43,6 milioni ARR (2024)", crescita: "Gestore di oltre 300 estensioni di dominio (TLD) a livello globale", presenza: "300+ estensioni domini; presente in tutto il mondo", dipendenti: "264 dipendenti", updated: "29/06/2026" },
+  cegid: { fatturato: "€967 milioni (2024)", crescita: "Acquisizioni Ageras e Shine (2025) per espansione europea", presenza: "750.000+ clienti in 130 paesi", dipendenti: "4.775 dipendenti", updated: "29/06/2026" },
+  spectris: { fatturato: "£1,299 miliardi (2024)", crescita: "Acquisizione Micromeritics e integrazione SAP 4HANA (2024)", presenza: "Quotata LSE; 7.400 dipendenti in tutto il mondo", dipendenti: "7.400 dipendenti", updated: "29/06/2026" },
+  brooksautomation: { fatturato: "~$514 milioni (2021, pre-scissione)", crescita: "Carve-out da Brooks Automation completato nel 2021; focus su semiconduttori", presenza: "USA e Asia; clienti nei principali produttori di semiconduttori", dipendenti: "N/D", updated: "29/06/2026" },
+  ublox: { fatturato: "CHF 201,8 milioni (2024)", crescita: "Leader nei moduli IoT e posizionamento GNSS per automotive e industria", presenza: "Quotata SIX Swiss Exchange; clienti in 100+ paesi", dipendenti: "~1.100 dipendenti", updated: "29/06/2026" },
+  colibrigroup: { fatturato: "N/D (società privata)", crescita: "501-1.000 dipendenti; crescita sostenuta tramite acquisizioni", presenza: "Leader USA nella formazione professionale per licenziatari (real estate, healthcare, finance)", dipendenti: "501-1.000 dipendenti", updated: "29/06/2026" },
+  mantech: { fatturato: "~$2,4 miliardi (2022, pre-acquisizione Carlyle)", crescita: "Acquisita da Carlyle Group nel 2022; crescita nei contratti governo USA", presenza: "USA e 40+ paesi; contratti con Dipartimento della Difesa e intelligence USA", dipendenti: "~9.000 dipendenti", updated: "29/06/2026" },
+  conservice: { fatturato: "N/D (società privata)", crescita: "Leader USA nella gestione utility per immobili residenziali e commerciali", presenza: "25.000+ proprietà gestite in USA; oltre 4 milioni di inquilini serviti", dipendenti: "~2.000 dipendenti", updated: "29/06/2026" },
+  globalhealthexchange: { fatturato: "N/D (società privata)", crescita: "Piattaforma B2B per supply chain sanitaria; 40+ miliardi $ transazioni annue", presenza: "4.000+ ospedali e 1.000+ fornitori healthcare connessi in USA", dipendenti: "~600 dipendenti", updated: "29/06/2026" },
+  keystone: { fatturato: "N/D (parte di LKQ Corporation pre-scissione)", crescita: "Maggiore distributore USA di ricambi auto aftermarket", presenza: "USA e Canada; 200+ centri distribuzione", dipendenti: "N/D", updated: "29/06/2026" },
+  infragroup: { fatturato: "N/D (società privata)", crescita: "Espansione nei servizi aziendali in Europa meridionale", presenza: "Europa; gestione servizi HR e outsourcing", dipendenti: "N/D", updated: "29/06/2026" },
+  marinerwealthadvisors: { fatturato: "N/D (società privata)", crescita: "+forte crescita AUM 2024-2025; serie di acquisizioni completate", presenza: "$100+ miliardi AUM; 50+ uffici negli USA", dipendenti: "~800 dipendenti", updated: "29/06/2026" },
+  precisionaviationgroup: { fatturato: "N/D (società privata)", crescita: "Espansione MRO in nuovi mercati internazionali", presenza: "USA, Europa, Asia; servizi MRO per aviazione civile e militare", dipendenti: "N/D", updated: "29/06/2026" },
+  agn: { fatturato: "N/D (società privata)", crescita: "Crescita nel settore industriale europeo con Adagia Partners", presenza: "Europa; servizi e prodotti industriali specialistici", dipendenti: "N/D", updated: "29/06/2026" },
+  ifs: { fatturato: "€1,228 miliardi (2024)", crescita: "ARR +23% YoY (2025); cloud revenue +30% YoY (2025)", presenza: "10.000+ clienti in 60+ paesi; 6.000+ dipendenti", dipendenti: "6.000+ dipendenti", updated: "29/06/2026" },
+  modernizingmedicine: { fatturato: "N/D (società privata)", crescita: "Leader EHR specialistico per dermatologia, ortopedia, oftalmologia", presenza: "USA; 30.000+ provider medici utilizzano la piattaforma", dipendenti: "~2.000 dipendenti", updated: "29/06/2026" },
+  kabafusion: { fatturato: "N/D (società privata)", crescita: "Espansione nelle terapie infusionali domiciliari in nuovi stati USA", presenza: "USA; 50+ farmacie specialistiche; 100.000+ pazienti serviti", dipendenti: "~2.500 dipendenti", updated: "29/06/2026" },
+  ardonoghgroup: { fatturato: "£1,6+ miliardi (2024 stimato)", crescita: "50+ acquisizioni completate; espansione in Europa e USA", presenza: "UK, Europa, USA, Australia; 150+ società broker acquisite", dipendenti: "12.000+ dipendenti", updated: "29/06/2026" },
+  rubix: { fatturato: "€2+ miliardi (2023 stimato)", crescita: "Maggiore distributore MRO d'Europa per numero di sedi", presenza: "16 paesi europei; 700+ sedi di distribuzione", dipendenti: "8.000+ dipendenti", updated: "29/06/2026" },
+  zuto: { fatturato: "N/D (società privata)", crescita: "Crescita doppia cifra nel finanziamento auto online UK", presenza: "UK; £1+ miliardi finanziamenti auto erogati dal 2006", dipendenti: "~250 dipendenti", updated: "29/06/2026" },
+  vinted: { fatturato: "€1,1 miliardi (2025)", crescita: "GMV €10,8 miliardi (+47% YoY 2025); revenue +38% YoY", presenza: "21 paesi europei; 100+ milioni di utenti registrati", dipendenti: "2.000+ dipendenti", updated: "29/06/2026" },
+  hargreaveslansdown: { fatturato: "£760 milioni (2024)", crescita: "Acquisita da CVC/Nordic Capital/ADIA (2025) per £5,4 miliardi", presenza: "UK; 1,8+ milioni clienti; £150+ miliardi AUA", dipendenti: "~2.300 dipendenti", updated: "29/06/2026" },
+  accountor: { fatturato: "N/D (società privata)", crescita: "Espansione cloud e AI per PMI nei paesi nordici e baltici", presenza: "Finlandia, Svezia, Norvegia, Danimarca, Olanda; 50.000+ clienti PMI", dipendenti: "~2.000 dipendenti", updated: "29/06/2026" },
+  metronetfiber: { fatturato: "N/D (società privata)", crescita: "Espansione fibra FTTH in Midwest USA; 3+ milioni case raggiunte", presenza: "Indiana, Illinois, Michigan, Ohio, Texas; 3+ milioni abitazioni coperte", dipendenti: "~2.000 dipendenti", updated: "29/06/2026" },
+  motelone: { fatturato: "~€1 miliardo (2024 stimato)", crescita: "Espansione in nuove città europee e USA con il modello budget-design", presenza: "80+ hotel in Europa e USA; 25.000+ camere", dipendenti: "~5.000 dipendenti", updated: "29/06/2026" },
+  yellowstonelandscape: { fatturato: "N/D (società privata)", crescita: "Maggiore società di paesaggistica commerciale nel Sud-Est USA", presenza: "USA Sud-Est; oltre 6.000 clienti commerciali", dipendenti: "~4.000 dipendenti", updated: "29/06/2026" },
+  varsitybrands: { fatturato: "~$1 miliardo (2023 stimato)", crescita: "Acquisita da KKR (2024); leader USA in abbigliamento sportivo scolastico", presenza: "USA; presente in 90%+ delle scuole superiori americane", dipendenti: "~5.000 dipendenti", updated: "29/06/2026" },
+  omnia: { fatturato: "N/D (società privata)", crescita: "GPO più grande degli USA per enti pubblici e aziende private", presenza: "USA; $100+ miliardi in acquisti gestiti annualmente", dipendenti: "~500 dipendenti", updated: "29/06/2026" },
+  anticimex: { fatturato: "~€1,5 miliardi (2024 stimato)", crescita: "Espansione digitale con sensori IoT per pest control preventivo", presenza: "20+ paesi in Europa, Asia, Australia; 600+ uffici", dipendenti: "~13.000 dipendenti", updated: "29/06/2026" },
+  savory: { fatturato: "N/D (società privata)", crescita: "Crescita nel segmento clean label e ingredienti naturali in Europa", presenza: "Europa; clienti in food industry e ristorazione", dipendenti: "N/D", updated: "29/06/2026" },
+  benecon: { fatturato: "N/D (società privata)", crescita: "Crescita nei benefit sanitari per PMI; modello cooperativo unico negli USA", presenza: "USA; 3.000+ aziende clienti; 400.000+ dipendenti coperti", dipendenti: "~500 dipendenti", updated: "29/06/2026" },
+  avetta: { fatturato: "N/D (società privata)", crescita: "Leader globale nella gestione compliance fornitori per grandi aziende", presenza: "130+ paesi; 500+ clienti enterprise; 150.000+ fornitori qualificati", dipendenti: "~700 dipendenti", updated: "29/06/2026" },
+  rehlko: { fatturato: "~$1 miliardo (2024 stimato, ex-Kohler Power)", crescita: "Spin-off da Kohler completato nel 2023; crescita nel backup energetico", presenza: "USA e 50+ paesi; leader nei generatori residenziali e industriali", dipendenti: "~3.500 dipendenti", updated: "29/06/2026" },
+  maxar: { fatturato: "$2,0 miliardi (2022, pre-acquisizione Advent)", crescita: "Acquisita da Advent International (2023) per $6,4 miliardi; contratti NASA e Dipartimento Difesa USA", presenza: "USA, Canada, UK; 5+ satelliti operativi in orbita", dipendenti: "~4.000 dipendenti", updated: "29/06/2026" },
+  hsi: { fatturato: "N/D (società privata)", crescita: "Leader USA nella formazione sicurezza sul lavoro e EHS compliance", presenza: "USA; 50.000+ aziende clienti; 5+ milioni lavoratori formati", dipendenti: "~1.000 dipendenti", updated: "29/06/2026" },
+  sphera: { fatturato: "N/D (società privata)", crescita: "Leader globale software ESG e gestione rischi operativi; acquisita da Blackstone (2025)", presenza: "Globale; 3.000+ clienti enterprise in 100+ paesi", dipendenti: "~1.000 dipendenti", updated: "29/06/2026" },
+  classiccollision: { fatturato: "N/D (società privata)", crescita: "Da 0 a 170+ centri di riparazione in 10 anni; rapida espansione USA", presenza: "USA; 170+ centri carrozzeria in 20+ stati", dipendenti: "~5.000 dipendenti", updated: "29/06/2026" },
+  rimes: { fatturato: "N/D (società privata)", crescita: "Leader globale nella gestione dati benchmark per asset manager", presenza: "Globale; 300+ clienti tra i maggiori asset manager del mondo", dipendenti: "~500 dipendenti", updated: "29/06/2026" },
+  syneoshealth: { fatturato: "$5,2 miliardi (2022)", crescita: "Acquisita da Veritas Capital (2023) per $7,1 miliardi", presenza: "110+ paesi; 25.000+ dipendenti; 500+ studi clinici gestiti", dipendenti: "25.000+ dipendenti", updated: "29/06/2026" },
+  everfox: { fatturato: "N/D (società privata)", crescita: "Spin-off da Forcepoint completato nel 2023; focus su cybersecurity governo", presenza: "USA e alleati NATO; clienti in 90+ agenzie governative", dipendenti: "~700 dipendenti", updated: "29/06/2026" },
+  houghtonmifflin: { fatturato: "~$900 milioni (2022)", crescita: "Acquisita da Veritas Capital (2023); trasformazione digitale in corso", presenza: "USA; 50+ milioni studenti raggiunti con contenuti digitali", dipendenti: "~3.000 dipendenti", updated: "29/06/2026" },
+  autocirc: { fatturato: "N/D (società privata)", crescita: "Da 0 a 100+ sedi in 5 anni; leader europeo ricambi auto usati", presenza: "Svezia, Norvegia, Finlandia, Germania, UK; 100+ centri smantellamento", dipendenti: "~2.000 dipendenti", updated: "29/06/2026" },
+  educagroup: { fatturato: "N/D (società privata)", crescita: "Acquisita da KKR (2023); espansione in nuovi mercati nordici", presenza: "Finlandia, Svezia, Estonia; 800+ centri educativi e asili nido", dipendenti: "~5.000 dipendenti", updated: "29/06/2026" },
+  netwrix: { fatturato: "N/D (società privata)", crescita: "Leader nella data security governance per PMI e enterprise", presenza: "Globale; 13.000+ clienti in 100+ paesi", dipendenti: "~1.200 dipendenti", updated: "29/06/2026" },
+  woodmackenzie: { fatturato: "N/D (società privata)", crescita: "Leader mondiale nell'analisi energia, rinnovabili e risorse naturali", presenza: "Globale; 1.000+ clienti tra le maggiori energy company del mondo", dipendenti: "~2.000 dipendenti", updated: "29/06/2026" },
+  enstar: { fatturato: "$1,1 miliardi (2024 stimato)", crescita: "Leader mondiale nel run-off assicurativo; $30+ miliardi asset gestiti", presenza: "Bermuda, USA, UK, Europa, Asia-Pacifico", dipendenti: "~700 dipendenti", updated: "29/06/2026" },
+  nthdegree: { fatturato: "N/D (società privata)", crescita: "Leader USA nei servizi di exhibit e allestimenti fieristici", presenza: "USA e internazionale; servizi per Fortune 500 companies", dipendenti: "~1.500 dipendenti", updated: "29/06/2026" },
+  fdhaero: { fatturato: "N/D (società privata)", crescita: "Espansione nella distribuzione di fasteners aeronautici certificati", presenza: "USA, Europa, Asia; fornitore di Boeing, Airbus e Lockheed Martin", dipendenti: "~800 dipendenti", updated: "29/06/2026" },
+  newforma: { fatturato: "N/D (società privata)", crescita: "Leader nel software di project management per architettura e ingegneria", presenza: "USA, Canada, Australia, UK; 2.000+ studi di architettura clienti", dipendenti: "~400 dipendenti", updated: "29/06/2026" },
+  zeus: { fatturato: "~$500 milioni (2023 stimato)", crescita: "Leader mondiale nei polimeri avanzati per dispositivi medici minimally invasive", presenza: "USA, Irlanda; fornitore dei principali produttori di dispositivi medici", dipendenti: "~2.000 dipendenti", updated: "29/06/2026" },
+  uslbm: { fatturato: "~$6 miliardi (2024 stimato)", crescita: "Da startup 2009 a leader distribuzione materiali edili USA; 50+ acquisizioni", presenza: "USA; 400+ sedi in 42 stati", dipendenti: "~9.000 dipendenti", updated: "29/06/2026" },
+  standish: { fatturato: "N/D (società privata)", crescita: "Leader nell'amministrazione di fondi e limited partnership per private equity", presenza: "USA; gestisce oltre 4.000 limited partnership", dipendenti: "~400 dipendenti", updated: "29/06/2026" },
+  amplifi: { fatturato: "N/D (società privata)", crescita: "Crescita nel settore loyalty per banche community e credit union", presenza: "USA; 600+ istituti finanziari clienti; 10+ milioni titolari carte", dipendenti: "~300 dipendenti", updated: "29/06/2026" },
+  integratedpower: { fatturato: "N/D (società privata)", crescita: "Leader USA nella riparazione motori elettrici e trasformatori industriali", presenza: "USA; 65+ sedi di servizio; clienti in utility, oil&gas, manifattura", dipendenti: "~3.000 dipendenti", updated: "29/06/2026" },
+  berrypalmerlyle: { fatturato: "N/D (società privata)", crescita: "Specialista in soluzioni finanziarie per mercati emergenti e frontier", presenza: "UK, Africa, Asia; servizi a banche centrali e istituzioni finanziarie", dipendenti: "N/D", updated: "29/06/2026" },
+  fifty5blue: { fatturato: "N/D (società privata)", crescita: "Spin-off da Kantar Group (2025); focus su misurazione audience cross-media", presenza: "UK, Europa, USA; dati per 50+ broadcaster e agenzie media", dipendenti: "~500 dipendenti", updated: "29/06/2026" },
+
+let companyData = JSON.parse(localStorage.getItem("companyData") || "null") || DEFAULT_COMPANY_DATA;
+let history = JSON.parse(localStorage.getItem("famHistory") || "null") || { articleUrls: [], numeriTexts: {}, sapeviTexts: {} };
+let state = { status: "idle", stampa: [], numeri: [], sapevi: [], selected: [] };
+
+document.getElementById("headerDate").textContent = new Date().toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+if (serpApiKey) showBannerOk();
+renderDataGrid();
+
+function resetHistory() {
+  if (!confirm("Sicuro di voler azzerare la cronologia? Gli articoli e le curiosità già pubblicate potranno essere riproposte.")) return;
+  history = { articleUrls: [], numeriTexts: {}, sapeviTexts: {} };
+  localStorage.setItem("famHistory", JSON.stringify(history));
+  updateHistoryCount();
+}
+
+function updateHistoryCount() {
+  const el = document.getElementById("historyCount");
+  if (!el) return;
+  const nArticles = history.articleUrls.length;
+  const nCuriosita = Object.values(history.sapeviTexts).reduce((s, arr) => s + arr.length, 0);
+  el.textContent = `Attualmente memorizzati: ${nArticles} articoli, ${nCuriosita} curiosità.`;
+}
+updateHistoryCount();
+
+function saveKey() {
+  const val = document.getElementById("keyInput").value.trim();
+  if (!val) return;
+  serpApiKey = val;
+  localStorage.setItem("serpApiKey", val);
+  showBannerOk();
+}
+function editKey() {
+  document.getElementById("bannerOk").style.display = "none";
+  document.getElementById("bannerWarning").style.display = "block";
+  document.getElementById("keyInput").value = serpApiKey;
+}
+function showBannerOk() {
+  document.getElementById("bannerWarning").style.display = "none";
+  document.getElementById("bannerOk").style.display = "flex";
+}
+
+function switchTab(tab) {
+  document.getElementById("view-genera").style.display = tab === "genera" ? "block" : "none";
+  document.getElementById("view-dati").style.display = tab === "dati" ? "block" : "none";
+  document.getElementById("tab-genera").className = "tab" + (tab === "genera" ? " active" : "");
+  document.getElementById("tab-dati").className = "tab" + (tab === "dati" ? " active" : "");
+}
+
+function renderDataGrid() {
+  const grid = document.getElementById("companyDataGrid");
+  grid.innerHTML = COMPANIES.map(c => {
+    const d = companyData[c.id] || {};
+    return `
+    <div class="company-data-card">
+      <div class="company-data-name">
+        ${c.name}
+        <span style="font-size:10px;color:#c9a84c;font-weight:400;">${c.sector}</span>
+      </div>
+      <div class="data-field">
+        <div class="data-label">Fatturato</div>
+        <input class="data-input" id="d_${c.id}_fatturato" placeholder="es. €4,2 miliardi (2024)" value="${d.fatturato || ''}" />
+      </div>
+      <div class="data-field">
+        <div class="data-label">Crescita</div>
+        <input class="data-input" id="d_${c.id}_crescita" placeholder="es. +18% annuo (2024)" value="${d.crescita || ''}" />
+      </div>
+      <div class="data-field">
+        <div class="data-label">Negozi / Clienti / Presenza</div>
+        <input class="data-input" id="d_${c.id}_presenza" placeholder="es. 2.500 negozi in 12 paesi" value="${d.presenza || ''}" />
+      </div>
+      <div class="data-field">
+        <div class="data-label">Dipendenti</div>
+        <input class="data-input" id="d_${c.id}_dipendenti" placeholder="es. 74.000 dipendenti" value="${d.dipendenti || ''}" />
+      </div>
+      ${d.updated ? `<div class="data-updated">Aggiornato: ${d.updated}</div>` : ''}
+    </div>`;
+  }).join("");
+}
+
+function saveAllData() {
+  COMPANIES.forEach(c => {
+    companyData[c.id] = {
+      fatturato: document.getElementById(`d_${c.id}_fatturato`).value.trim(),
+      crescita: document.getElementById(`d_${c.id}_crescita`).value.trim(),
+      presenza: document.getElementById(`d_${c.id}_presenza`).value.trim(),
+      dipendenti: document.getElementById(`d_${c.id}_dipendenti`).value.trim(),
+      updated: new Date().toLocaleDateString("it-IT")
+    };
+  });
+  localStorage.setItem("companyData", JSON.stringify(companyData));
+  const status = document.getElementById("saveStatus");
+  status.textContent = "✓ Salvato!";
+  setTimeout(() => { status.textContent = ""; }, 2000);
+  renderDataGrid();
+}
+
+function getNumeriForCompany(company) {
+  const d = companyData[company.id] || {};
+  const lines = [];
+  if (d.fatturato) lines.push(`- **${d.fatturato}** di fatturato`);
+  if (d.presenza) lines.push(`- **${d.presenza}**`);
+  if (!lines.length) return `### ${company.name}\n- Dati non ancora inseriti — vai alla tab "Dati Aziende" per aggiungerli`;
+  return `### ${company.name}\n${lines.join("\n")}`;
+}
+
+function pickRandom6(arr) {
+  return [...arr].sort(() => Math.random() - 0.5).slice(0, 6);
+}
+
+function setProgress(current, total, label) {
+  document.getElementById("controlSub").textContent = `${label} (${current}/${total})`;
+  document.getElementById("progressFill").style.width = `${(current / total) * 100}%`;
+}
+
+async function callClaude(prompt) {
+  const res = await fetch(`${WORKER_URL}?action=claude&apikey=${serpApiKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages: [{ role: "user", content: prompt }] })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error?.message || "API error");
+  return data?.choices?.[0]?.message?.content?.trim() || "";
+}
+
+async function fetchNews(company) {
+  const url = `${WORKER_URL}?action=news&q=${encodeURIComponent(company.query)}&apikey=${serpApiKey}`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const results = data?.news_results;
+  if (!results || !results.length) return null;
+  // Scarta articoli già usati nelle edizioni precedenti
+  const fresh = results.find(a => a.link && !history.articleUrls.includes(a.link));
+  const a = fresh || results[0]; // se tutti già usati, riusa il primo (meglio che niente)
+  const sourceName = a.source && typeof a.source === "object" ? a.source.name : (a.source || "Google News");
+  return { title: a.title || "", source: sourceName, url: a.link || "", date: a.date || "", description: "", thumbnail: a.thumbnail || "", isRepeat: !fresh };
+}
+
+function getFallbackThumbnail(company) {
+  // Mappa settore -> keyword Unsplash per immagini pertinenti
+  const sectorKeywords = {
+    "Retail": "retail store shopping",
+    "Consumer": "consumer products",
+    "Software": "software technology computer",
+    "Technology": "technology innovation",
+    "Cybersecurity": "cybersecurity digital security",
+    "Healthcare": "healthcare medical",
+    "Industrials": "industrial factory manufacturing",
+    "Financial": "finance business",
+    "Education": "education school learning",
+    "Insurance": "insurance business",
+    "Materials": "materials packaging industrial",
+    "Communications": "communications network",
+    "Real Estate": "real estate building",
+    "Energy": "energy power",
+    "Automotive": "automotive car",
+    "Aerospace": "aerospace aviation",
+    "Food": "food ingredients",
+    "Logistics": "logistics supply chain",
+  };
+  // Trova keyword dal settore dell'azienda
+  const sector = company.sector || "";
+  let keyword = "business corporate";
+  for (const [key, val] of Object.entries(sectorKeywords)) {
+    if (sector.toLowerCase().includes(key.toLowerCase())) {
+      keyword = val;
+      break;
+    }
+  }
+  // Unsplash Source API - immagine random per keyword, dimensioni fisse
+  const seed = company.id; // seed deterministico per avere sempre la stessa immagine per azienda
+  return `https://source.unsplash.com/400x250/?${encodeURIComponent(keyword)}&sig=${seed}`;
+}
+
+async function generateArticleDescription(company, article) {
+  if (!article || !article.title) return "";
+  const prompt = `Sei un analista di comunicazione per Fineco Asset Management.
+Basandoti SOLO su questo titolo di un articolo reale su ${company.name}, scrivi una descrizione di MASSIMO 2 frasi brevi che spieghi di cosa parla l'articolo in modo utile per un consulente finanziario.
+
+Titolo: "${article.title}"
+Fonte: ${article.source} — ${article.date}
+
+Rispondi SOLO con la descrizione, niente altro. Massimo 2 frasi. Tono diretto. Non iniziare con "L'articolo" o "Questo articolo".`;
+  try {
+    return await callClaude(prompt);
+  } catch(e) {
+    return "";
+  }
+}
+
+function buildPrompt(company, section) {
+  if (section === "sapevi") {
+    const prevTexts = history.sapeviTexts[company.id] || [];
+    const avoidNote = prevTexts.length
+      ? `\n\nIMPORTANTE: NON usare nessuna di queste curiosità già usate in edizioni precedenti, scegli categoria e fatto diversi:\n${prevTexts.map(t => `- ${t}`).join("\n")}`
+      : "";
+    return `Sei un esperto di comunicazione commerciale per Fineco Asset Management.
+Scrivi UNA curiosità su ${company.name} (${company.sector}, ${company.country}) che un consulente finanziario possa usare per emozionare un cliente durante una trattativa.
+
+La curiosità deve appartenere a una di queste categorie (scegli quella più potente per questa azienda):
+- Origin Story: come è nata l'azienda (garage, dormitorio, problema personale, investimento di tutti i risparmi)
+- Il primo lavoro del CEO/fondatore (magazziniere, operaio, venditore porta a porta, commessa)
+- L'errore che ha cambiato tutto (prodotto fallito, fallimento, licenziamento, cliente perso)
+- Il primo cliente (primo ordine, primo contratto, cliente storico ancora attivo)
+- L'invenzione nata per caso (errore produttivo, scoperta accidentale, prototipo in garage)
+- La crisi superata (quasi fallita, sopravvissuta a Covid o 2008, stabilimento distrutto)
+- Record e primati (primo produttore europeo, leader mondiale in una nicchia, unico brevetto)
+- Clienti famosi (fornitore NASA, Ferrari, Formula 1, ospedali top)
+- Dietro le quinte produttivo (quanti prodotti al giorno, km percorsi, test effettuati)
+- Stranezze dei fondatori (CEO musicista, nome dall'animale domestico, maratoneta)
+
+Formato ESATTO — rispondi solo con questo, niente altro:
+### ${company.name}
+[UNA sola curiosità. 2-3 righe max. Deve creare un momento "wow" nella conversazione. Inizia con il fatto, non con il nome dell'azienda. Esempio perfetto: "Il fondatore vendeva i suoi primi prodotti dal bagagliaio dell'auto, porta a porta, prima di aprire il primo negozio nel 1993."]
+
+Niente introduzioni. Niente commenti.${avoidNote}`;
+  }
+}
+
+async function genera() {
+  if (!serpApiKey) { alert("Inserisci prima la chiave SerpAPI!"); return; }
+  const btn = document.getElementById("btnGenera");
+  btn.disabled = true;
+  btn.textContent = "⏳ Generazione in corso...";
+  document.getElementById("progressWrap").style.display = "block";
+
+  document.getElementById("controlTitle").textContent = "Generazione in corso...";
+  document.getElementById("contentArea").innerHTML = `<div class="card empty-state"><div style="font-size:44px;margin-bottom:14px">⏳</div><div class="empty-title" style="color:#1a1a2e">Ricerca in corso...</div><div class="empty-sub">Sto cercando notizie e generando spunti per 6 aziende</div></div>`;
+
+  state.stampa = [];
+  state.numeri = [];
+  state.sapevi = [];
+
+  // Step 1: trova 6 aziende con articoli reali
+  setProgress(1, 10, "Ricerca articoli per le aziende...");
+  const shuffled = [...COMPANIES].sort(() => Math.random() - 0.5);
+  const validCompanies = [];
+  const usedIds = new Set();
+
+  for (const company of shuffled) {
+    if (validCompanies.length >= 6) break;
+    setProgress(validCompanies.length + 1, 6, `Verifica articoli — ${company.name}`);
+    try {
+      const article = await fetchNews(company);
+      if (article && article.title) {
+        validCompanies.push({ company, article });
+        usedIds.add(company.id);
+      }
+    } catch(e) {}
+  }
+
+  // Se non troviamo 6, usiamo quelle disponibili
+  const six = validCompanies.slice(0, 6);
+  state.selected = six.map(v => v.company);
+
+  const total = six.length * 2; // descrizione + sapevi
+  let current = 0;
+
+  for (const { company, article } of six) {
+    // DESCRIZIONE ARTICOLO
+    setProgress(++current, total, `Descrizione — ${company.name}`);
+    article.description = await generateArticleDescription(company, article);
+    state.stampa.push({ company, article });
+
+    // NUMERI
+    state.numeri.push({ company, text: getNumeriForCompany(company) });
+
+    // LO SAPEVI
+    setProgress(++current, total, `Lo Sapevi? — ${company.name}`);
+    try {
+      const text = await callClaude(buildPrompt(company, "sapevi"));
+      state.sapevi.push({ company, text });
+    } catch(e) {
+      state.sapevi.push({ company, text: `### ${company.name}\nDati non disponibili` });
+    }
+  }
+
+  // Aggiorna history: salva URL articoli usati e curiosità generate
+  state.stampa.forEach(({ article }) => {
+    if (article && article.url && !history.articleUrls.includes(article.url)) {
+      history.articleUrls.push(article.url);
+    }
+  });
+  // Mantieni solo gli ultimi 60 URL (10 edizioni x 6 articoli)
+  if (history.articleUrls.length > 60) {
+    history.articleUrls = history.articleUrls.slice(-60);
+  }
+  state.sapevi.forEach(({ company, text }) => {
+    if (!history.sapeviTexts[company.id]) history.sapeviTexts[company.id] = [];
+    history.sapeviTexts[company.id].push(text);
+    // Mantieni solo le ultime 5 curiosità per azienda
+    if (history.sapeviTexts[company.id].length > 5) {
+      history.sapeviTexts[company.id] = history.sapeviTexts[company.id].slice(-5);
+    }
+  });
+  localStorage.setItem("famHistory", JSON.stringify(history));
+
+  state.status = "done";
+  document.getElementById("controlTitle").textContent = `Edizione generata · ${state.selected.map(c => c.name).join(" · ")}`;
+  document.getElementById("controlSub").textContent = "Documento pronto — esporta o rigenera";
+  document.getElementById("progressWrap").style.display = "none";
+  btn.disabled = false;
+  btn.textContent = "🔄 Rigenera";
+  renderResults();
+}
+
+function parseBody(text) {
+  return (text || "").split("\n").filter(l => l && !l.startsWith("###")).join("\n");
+}
+
+function renderBodyHTML(text) {
+  return (text || "").split("\n").filter(Boolean).map(line => {
+    const isBullet = line.startsWith("- ");
+    const content = (isBullet ? line.slice(2) : line).replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    return `<p class="body-line ${isBullet ? 'body-bullet' : ''}">${content}</p>`;
+  }).join("");
+}
+
+function renderResults() {
+  let html = "";
+
+  // STAMPA
+  html += `<div class="card"><div class="section-header"><div class="section-title">📰 Rassegna Stampa</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">`;
+  state.stampa.forEach(({ company, article }) => {
+    html += `<div style="border:1px solid #f0ebe0;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;">`;
+    if (article && article.thumbnail) {
+      html += `<img src="${article.thumbnail}" alt="" style="width:100%;height:140px;object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=140&fit=crop&auto=format';this.onerror=null;" />`;
+    } else {
+      // Fallback: immagine generica per settore basata su Unsplash
+      const fallbackMap = {
+        "Consumer": ["1556742049-0cfed4f6a45d", "1472851294608-ac0bf94e5ccb", "1607082348824-0a96f2a4b9da"],
+        "Technology": ["1518770660439-4636190af475", "1488590528505-98d2b5aba04b", "1451187580459-43490279c0fa"],
+        "Healthcare": ["1576091160550-2173dba999ef", "1559757148-7a0d8e2c28a7", "1538108149393-dbcf440516a6"],
+        "Financial": ["1611974789855-9c2a0a7236a3", "1460925895917-afdab827c52f", "1554224155-6726b3ff858f"],
+        "Industrials": ["1565043589221-1a6fd9ae45c7", "1581092918056-0c4c3aebb8e9", "1504328345606-18bbc8c9d7d1"],
+        "Software": ["1461749280684-dccba630e2f6", "1555949963-ff9fe0c870eb", "1587620931998-e9e26477f21e"],
+        "Education": ["1503676260728-1c00da094a0b", "1523050854058-8df90110c9f1", "1509062522246-3c80d95f91b0"],
+        "Insurance": ["1554224155-6726b3ff858f", "1507679799987-c73779587ccf", "1521791055366-0d553872952f"],
+        "Materials": ["1558618666-fcd25c85cd64", "1565193566173-7a0ee3dbe261", "1504328345606-18bbc8c9d7d1"],
+        "Aerospace": ["1517976487492-5750f3195933", "1436891620584-47fd0e3e04a5", "1464802686167-b39a49e84a4c"],
+        "default": ["1507679799987-c73779587ccf", "1521791055366-0d553872952f", "1454165804606-c3d57bc86b40"]
+      };
+      const sector = company.sector || "";
+      const key = Object.keys(fallbackMap).find(k => k !== "default" && sector.toLowerCase().includes(k.toLowerCase())) || "default";
+      const imgs = fallbackMap[key];
+      // Seleziona immagine diversa per ogni azienda in modo deterministico
+      const imgId = imgs[company.id.charCodeAt(0) % imgs.length];
+      html += `<img src="https://images.unsplash.com/photo-${imgId}?w=400&h=140&fit=crop&auto=format" alt="" style="width:100%;height:140px;object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=140&fit=crop&auto=format';this.onerror=null;" />`;
+    }
+    html += `<div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:6px;">
+      <div class="company-name" style="margin-bottom:0;">${company.name}<span class="company-sector">${company.sector}</span></div>`;
+    if (article && article.title) {
+      html += `<p style="font-size:13px;font-weight:600;line-height:1.5;color:#1a1a2e;">${article.title}</p>
+      ${article.isRepeat ? `<p style="font-size:10px;color:#c9a84c;font-weight:600;">⚠ Articolo già usato in edizione precedente (nessuna alternativa trovata)</p>` : ""}
+      ${article.description ? `<p style="font-size:12px;line-height:1.6;color:#555;flex:1;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;">${article.description}</p>` : ""}
+      <p class="article-meta" style="margin-top:auto;margin-bottom:8px;"><strong>${article.source}</strong> · ${article.date}</p>
+      <a href="${article.url}" target="_blank" style="display:block;text-align:center;font-size:11px;font-weight:700;color:#1a1a2e;background:#f0ebe0;padding:8px 12px;border-radius:4px;text-decoration:none;letter-spacing:0.5px;">LEGGI ARTICOLO COMPLETO →</a>`;
+    } else {
+      html += `<p class="no-article">Nessun articolo trovato.</p>`;
+    }
+    html += `</div></div>`;
+  });
+  html += `</div></div>`;
+
+  // NUMERI
+  html += `<div class="card"><div class="section-header"><div class="section-title">📊 Numeri che Fanno Parlare</div></div><div class="grid-2">`;
+  state.numeri.forEach(({ company, text }) => {
+    const body = parseBody(text);
+    const isEmpty = body.includes("non ancora inseriti");
+    html += `<div class="company-block">
+      <div class="company-name">${company.name}<span class="company-sector">${company.sector}</span></div>
+      ${isEmpty
+        ? `<p class="no-article">Dati non inseriti — <a href="#" onclick="switchTab('dati');return false;" style="color:#c9a84c;">vai a Dati Aziende →</a></p>`
+        : renderBodyHTML(body)
+      }
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  // CURIOSITÀ
+  html += `<div class="card"><div class="section-header"><div class="section-title">✨ Curiosità</div></div><div class="grid-2">`;
+  state.sapevi.forEach(({ company, text }) => {
+    const body = parseBody(text);
+    html += `<div class="company-block">
+      <div class="company-name">${company.name}<span class="company-sector">${company.sector}</span></div>
+      <div class="highlight-box">${renderBodyHTML(body)}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  // EXPORT
+  html += `<div class="export-bar">
+    <button class="btn-secondary" onclick="copyAll()">📋 Copia testo strutturato</button>
+    <button class="btn-export" onclick="exportPdf()">⬇ Esporta PDF</button>
+  </div>`;
+
+  document.getElementById("contentArea").innerHTML = html;
+}
+
+function copyAll() {
+  const date = new Date().toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+  let out = `FAM ELTIF Private Equity Fund\nRassegna stampa e Spunti commerciali — ${date}\n\n`;
+  out += `━━━ 📰 RASSEGNA STAMPA ━━━\n\n`;
+  state.stampa.forEach(({ company, article }) => {
+    out += `${company.name}\n`;
+    if (article) out += `${article.title}\n${article.source} · ${article.date} · ${article.url}\n\n`;
+    else out += `Nessun articolo trovato.\n\n`;
+  });
+  out += `━━━ 📊 NUMERI CHE FANNO PARLARE ━━━\n\n`;
+  state.numeri.forEach(({ text }) => { out += text + "\n\n"; });
+  out += `━━━ ✨ CURIOSITÀ ━━━\n\n`;
+  state.sapevi.forEach(({ text }) => { out += text + "\n\n"; });
+  navigator.clipboard.writeText(out);
+  alert("✓ Testo copiato negli appunti!");
+}
+
+function exportPdf() {
+  const date = new Date().toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+
+  const pdfFallbackMap = {
+    "Consumer": "1556742049-0cfed4f6a45d", "Technology": "1518770660439-4636190af475",
+    "Healthcare": "1576091160550-2173dba999ef", "Financial": "1611974789855-9c2a0a7236a3",
+    "Industrials": "1565043589221-1a6fd9ae45c7", "Software": "1461749280684-dccba630e2f6",
+    "Education": "1503676260728-1c00da094a0b", "Aerospace": "1517976487492-5750f3195933",
+    "Materials": "1558618666-fcd25c85cd64", "Insurance": "1554224155-6726b3ff858f"
+  };
+  const stampaHtml = `<div class="grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">` + state.stampa.map(({ company, article }) => {
+    const sector = company.sector || "";
+    const fallbackKey = Object.keys(pdfFallbackMap).find(k => sector.toLowerCase().includes(k.toLowerCase())) || null;
+    const fallbackImg = fallbackKey ? `https://images.unsplash.com/photo-${pdfFallbackMap[fallbackKey]}?w=400&h=120&fit=crop&auto=format` : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=120&fit=crop&auto=format";
+    const thumbSrc = (article && article.thumbnail) ? article.thumbnail : fallbackImg;
+    return `
+    <div style="border:1px solid #e8e0d0;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;">
+      <img src="${thumbSrc}" alt="" style="width:100%;height:120px;object-fit:cover;" />
+      <div style="padding:12px;">
+        <div style="font-weight:700;font-size:12px;color:#1a1a2e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${company.name}</div>
+        ${article ? `<p style="font-size:12px;font-weight:600;line-height:1.5;color:#1a1a2e;margin-bottom:4px;">${article.title}</p>
+        ${article.description ? `<p style="font-size:11px;line-height:1.5;color:#555;margin-bottom:4px;">${article.description}</p>` : ""}
+        <p style="font-size:10px;color:#888;margin-bottom:6px;"><strong>${article.source}</strong> · ${article.date}</p>
+        <a href="${article.url}" style="display:inline-block;font-size:10px;font-weight:700;color:#1a1a2e;background:#f0ebe0;padding:6px 12px;border-radius:4px;text-decoration:none;letter-spacing:0.5px;">LEGGI ARTICOLO COMPLETO →</a>` : `<p style="font-size:11px;color:#bbb;font-style:italic;">Nessun articolo trovato.</p>`}
+      </div>
+    </div>`;
+  }).join("") + `</div>`;
+
+  const numeriHtml = state.numeri.map(({ company, text }) => {
+    const body = parseBody(text).split("\n").filter(Boolean).map(l => {
+      const c = (l.startsWith("- ") ? l.slice(2) : l).replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      return `<p style="font-size:12px;line-height:1.7;color:#333;padding-left:10px;border-left:2px solid #e0d8c8;margin-bottom:4px;">${c}</p>`;
+    }).join("");
+    return `<div style="margin-bottom:14px;"><div style="font-weight:700;font-size:12px;color:#1a1a2e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${company.name}</div>${body}</div>`;
+  }).join("");
+
+  const saveviHtml = state.sapevi.map(({ company, text }) => {
+    const body = parseBody(text).split("\n").filter(Boolean).map(l => `<p style="font-style:italic;font-size:12px;color:#1a1a2e;line-height:1.6;">${l}</p>`).join("");
+    return `<div style="margin-bottom:14px;"><div style="font-weight:700;font-size:12px;color:#1a1a2e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${company.name}</div><div style="background:#f8f4ea;border-left:3px solid #c9a84c;padding:10px 14px;">${body}</div></div>`;
+  }).join("");
+
+  const html = `<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Figtree',sans-serif;color:#1a1a2e;}
+.page{max-width:780px;margin:0 auto;padding:48px 40px;}
+.hdr{border-bottom:3px solid #c9a84c;padding-bottom:20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-end;}
+.hdr h1{font-size:20px;font-weight:800;}.hdr p{font-size:11px;color:#888;margin-top:3px;letter-spacing:1px;text-transform:uppercase;}
+.hdr-r{text-align:right;font-size:12px;color:#888;}.edition{font-size:11px;color:#c9a84c;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+.sec{margin-bottom:28px;}.sec-t{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#1a1a2e;border-bottom:2px solid #f0ebe0;padding-bottom:8px;margin-bottom:14px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.footer{border-top:1px solid #e8e0d0;padding-top:12px;text-align:center;font-size:10px;color:#aaa;margin-top:28px;}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+@media screen and (max-width:600px){.page{padding:24px 16px;}.grid{grid-template-columns:1fr;}.hdr{flex-direction:column;align-items:flex-start;gap:10px;}.hdr-r{text-align:left;}}
+</style></head>
+<body><div class="page">
+<div class="hdr"><div><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA4MDkxLjQ0IDExNTEuMzkiPgogIDwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAzMC41LjEsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiAyLjEuNCBCdWlsZCAzKSAgLS0+CiAgPHJlY3QgeD0iNDQyNi41NiIgd2lkdGg9IjE5LjYiIGhlaWdodD0iMTE1MS4zOSIvPgogIDxwYXRoIGQ9Ik01MDE5LjQxLDQ1My4zbC03MC4zLTEyNS4yNmgtMTIuMTJsLTcxLjM4LDEyNS4yNmgxNTMuOFpNNTA2MC41Myw1MjcuNGwtMjYuNzEtNDcuNjRoLTE4Mi42M2wtMjcuMDIsNDcuNjRoLTM0LjA1bDEyOC4wMS0yMjUuOGg0OC4xNGwxMjcuNjksMjI1LjhoLTMzLjQyWiIvPgogIDxwYXRoIGQ9Ik01MTI2LjQ3LDQ1Ni43NmgyOS4zMWMwLDIuMzMuMDQsNCwuMTcsNC45Ny40NSwxMi45MywxLjQyLDIxLjU0LDIuOTgsMjUuNzUsMS41NCw0LjE3LDQuOTUsNy40NywxMC4yNCw5LjgsOC4zOCwzLjYyLDM1LjgxLDUuNDYsODIuMjEsNS40NiwzOC4wMywwLDYyLjA3LTEuNjMsNzIuMS00LjgyLDE0LjY5LTQuNjEsMjIuMDEtMTUuODUsMjIuMDEtMzMuNjlzLTUuMTQtMjguNjctMTUuMzYtMzIuMjljLTUuNjEtMi4wMS0xMy41Mi0zLjE1LTIzLjU5LTMuNTMtMTAuMTQtLjI3LTQzLjAyLS40OS05OC42My0uNDktMzUuNywwLTU5LjMtNy4yNC03MC44MS0yMS43OC03LjIyLTkuMDQtMTAuODEtMjIuNzctMTAuODEtNDEuMjIsMC0yMC40LDUuNjktMzUuMTUsMTcuMDYtNDQuMzEsNS42MS00LjUzLDExLjcyLTcuOTQsMTguMzEtMTAuMjgsNi41OC0yLjMxLDE2LjA0LTQuMTUsMjguMjctNS42MSwyMC4xLTIuNDUsNDMuNzgtMy42Miw3MC45OC0zLjYyLDQ2LjgxLDAsNzcuMjgsNS43Myw5MS4zNSwxNy4xNCw2LjQxLDUuMTksMTAuNzcsMTEuMjQsMTMuMTIsMTguMTYsMi40MSw2Ljk0LDMuNywxNy41OSwzLjkyLDMyLjAyaC0zMC4xM3YtMy41MWMwLTEwLjg2LTEuMTktMTguMjItMy42Mi0yMi4wNy02LjY1LTEwLjgzLTMyLjA0LTE2LjI5LTc1LjkzLTE2LjI5LTUzLjk2LDAtODUuNzMsNC43Ni05NS4zMSwxNC4yNC00LjgzLDQuODUtNy4yNCwxMi44Ny03LjI0LDI0LjEyLDAsMTAuMTYsMS4yMSwxNy4zNywzLjY0LDIxLjY5LDIuNDEsNC4yNyw3LjExLDcuNTYsMTQuMiw5LjczLDEwLjIyLDMuMzYsMjkuOTYsNS4xLDU5LjE3LDUuMzEsNS41MiwwLDMwLjA3LjExLDczLjQ1LjMyLDE2LjE3LjE3LDI4LjYxLDEuNjcsMzcuMjQsNC42NSw4LjYxLDIuOTgsMTUuNzQsOC4xMywyMS4yMiwxNS40MSw2LjgzLDkuMSwxMC4yMiwyMi4zNSwxMC4yMiwzOS43cy0yLjc5LDI5LjQ4LTguNDIsMzguOWMtNi42LDEwLjk4LTE5LjA1LDE4LjMzLTM3LjM3LDIyLjExLTE4LjI2LDMuNzktNTEuMTEsNS42My05OC40Miw1LjYzLTQzLjQ3LDAtNzEuMjktMy40Ny04My41Mi0xMC40NS04LjM4LTQuNy0xNC4yMi0xMC44MS0xNy4zOS0xOC4xNi0zLjE3LTcuMy00LjgyLTE4LjI4LTQuODItMzIuODksMC0uNjQuMDktNCwuMTctMTAuMTEiLz4KICA8cGF0aCBkPSJNNTQyMi41MSw0NTYuNzZoMjkuMjVjMCwyLjMzLjA0LDQsLjE5LDQuOTcuNDcsMTIuOTMsMS40NCwyMS41NCwyLjk2LDI1Ljc1LDEuNDgsNC4xNyw0Ljk1LDcuNDcsMTAuMjYsOS44LDguNCwzLjYyLDM1Ljc5LDUuNDYsODIuMTcsNS40NiwzOC4wOSwwLDYyLjEzLTEuNjMsNzIuMTYtNC44MiwxNC42Ni00LjYxLDIxLjk5LTE1Ljg1LDIxLjk5LTMzLjY5cy01LjEyLTI4LjY3LTE1LjM4LTMyLjI5Yy01LjYxLTIuMDEtMTMuNDgtMy4xNS0yMy42LTMuNTMtMTAuMDktLjI3LTQzLS40OS05OC42My0uNDktMzUuNjQsMC01OS4yNS03LjI0LTcwLjgzLTIxLjc4LTcuMTctOS4wNC0xMC42OS0yMi43Ny0xMC42OS00MS4yMiwwLTIwLjQsNS42NS0zNS4xNSwxNy4wMS00NC4zMSw1LjU5LTQuNTMsMTEuNy03Ljk0LDE4LjMtMTAuMjgsNi42NC0yLjMxLDE2LjA0LTQuMTUsMjguMjktNS42MSwyMC4xLTIuNDUsNDMuOC0zLjYyLDcxLTMuNjIsNDYuNzcsMCw3Ny4yNiw1LjczLDkxLjMzLDE3LjE0LDYuNDMsNS4xOSwxMC43OSwxMS4yNCwxMy4xLDE4LjE2LDIuNDEsNi45NCwzLjcyLDE3LjU5LDMuOTIsMzIuMDJoLTMwLjEzdi0zLjUxYzAtMTAuODYtMS4xNi0xOC4yMi0zLjY0LTIyLjA3LTYuNjUtMTAuODMtMzItMTYuMjktNzUuOTEtMTYuMjktNTMuOTIsMC04NS43MSw0Ljc2LTk1LjI3LDE0LjI0LTQuODcsNC44NS03LjIyLDEyLjg3LTcuMjIsMjQuMTIsMCwxMC4xNiwxLjE2LDE3LjM3LDMuNiwyMS42OSwyLjQzLDQuMjcsNy4xNSw3LjU2LDE0LjIyLDkuNzMsMTAuMjIsMy4zNiwyOS45NCw1LjEsNTkuMTEsNS4zMSw1LjYxLDAsMzAuMDkuMTEsNzMuNDcuMzIsMTYuMjEuMTcsMjguNjEsMS42NywzNy4yNCw0LjY1LDguNjUsMi45OCwxNS43Niw4LjEzLDIxLjIzLDE1LjQxLDYuODMsOS4xLDEwLjI4LDIyLjM1LDEwLjI4LDM5LjdzLTIuODIsMjkuNDgtOC40NiwzOC45Yy02LjYsMTAuOTgtMTkuMDcsMTguMzMtMzcuMzksMjIuMTEtMTguMzMsMy43OS01MS4xMyw1LjYzLTk4LjQsNS42My00My40OSwwLTcxLjMxLTMuNDctODMuNTMtMTAuNDUtOC4zNi00LjctMTQuMTgtMTAuODEtMTcuMzctMTguMTYtMy4xNy03LjMtNC43OC0xOC4yOC00Ljc4LTMyLjg5LDAtLjY0LjAyLTQsLjE1LTEwLjExIi8+CiAgPHBvbHlnb24gcG9pbnRzPSI1NzI0Ljc4IDUyNy40IDU3MjQuNzggMzAxLjU5IDU5NDYuMDcgMzAxLjU5IDU5NDYuMDcgMzI4LjA0IDU3NTQuOSAzMjguMDQgNTc1NC45IDM5NyA1OTM4LjAxIDM5NyA1OTM4LjAxIDQyMy41IDU3NTQuOSA0MjMuNSA1NzU0LjkgNTAwLjg5IDU5NDYuMjYgNTAwLjg5IDU5NDYuMjYgNTI3LjQgNTcyNC43OCA1MjcuNCIvPgogIDxwb2x5Z29uIHBvaW50cz0iNTk3Ni4yNyAzMDEuNTggNjIzMi44NyAzMDEuNTggNjIzMi44NyAzMjguMDMgNjExOS44NyAzMjguMDMgNjExOS44NyA1MjcuMzkgNjA4OS43OCA1MjcuMzkgNjA4OS43OCAzMjguMDMgNTk3Ni4yNyAzMjguMDMgNTk3Ni4yNyAzMDEuNTgiLz4KICA8cG9seWdvbiBwb2ludHM9IjQ4MTAuMzMgNzA4LjEgNDg3MC40NSA3MDguMSA0OTkzLjA2IDg5OS41MSA1MTEzLjY0IDcwOC4xIDUxNzQuMTggNzA4LjEgNTE3NC4xOCA5MzMuOTYgNTE0NC4wOSA5MzMuOTYgNTE0NC4wOSA3MzYuMDYgNTEzMS41NiA3MzYuMDYgNTAwNS40OCA5MzMuOTYgNDk4MS4wMiA5MzMuOTYgNDg1My42NSA3MzYuMDYgNDg0MC40MiA3MzYuMDYgNDg0MC40MiA5MzMuOTYgNDgxMC4zMyA5MzMuOTYgNDgxMC4zMyA3MDguMSIvPgogIDxwYXRoIGQ9Ik01NDQyLjM5LDg1OS44MmwtNzAuMjYtMTI1LjIzaC0xMi4wNmwtNzEuNDIsMTI1LjIzaDE1My43NFpNNTQ4My41Nyw5MzMuOTdsLTI2Ljc1LTQ3LjY2aC0xODIuNTZsLTI3LjA1LDQ3LjY2aC0zNC4wM2wxMjcuOTktMjI1Ljg2aDQ4LjE0bDEyNy42OSwyMjUuODZoLTMzLjQyWiIvPgogIDxwb2x5Z29uIHBvaW50cz0iNTU1NS44MSA3MDguMSA1NjA1Ljg2IDcwOC4xIDU4MDMuNzQgOTA2LjE3IDU4MTAuNjkgOTA2LjE3IDU4MTAuNjkgNzA4LjEgNTg0MC43OCA3MDguMSA1ODQwLjc4IDkzMy45NiA1Nzg5LjkgOTMzLjk2IDU1OTIuNTEgNzM2LjQ0IDU1ODUuOTEgNzM2LjQ0IDU1ODUuOTEgOTMzLjk2IDU1NTUuODEgOTMzLjk2IDU1NTUuODEgNzA4LjEiLz4KICA8cGF0aCBkPSJNNjExMy45OCw4NTkuODJsLTcwLjIyLTEyNS4yM2gtMTIuMTdsLTcxLjM2LDEyNS4yM2gxNTMuNzZaTTYxNTUuMTQsOTMzLjk3bC0yNi43Ny00Ny42NmgtMTgyLjZsLTI3LjAyLDQ3LjY2aC0zNC4wMWwxMjguMDEtMjI1Ljg2aDQ4LjEybDEyNy42NywyMjUuODZoLTMzLjQxWiIvPgogIDxwYXRoIGQ9Ik02MzQ2LjE1LDgxOS40NmgxNDguMDFjLS4xNywzNS0xLjM2LDU3LjcxLTMuNDcsNjguMTQtMi4zNSwxMS41OC01Ljk1LDIwLjM0LTEwLjkyLDI2LjE4LTQuOTUsNS44NC0xMi41NSwxMC40NS0yMi44MywxMy45LTEzLjc4LDQuNDktNDUuMDMsNi43Ny05My43NSw2Ljc3LTQ2LjAzLDAtNzguMzgtMS40Ni05Ny4xMy00LjQ0LTE2LjUxLTIuNjUtMjguNDYtOS44NC0zNS44NS0yMS41OC04LjI3LTEzLjEtMTIuNC00Mi4yNC0xMi40LTg3LjI5LDAtMzMuODYsMi4wNS01Ny44OCw2LjI0LTcyLjAxLDUuMzEtMTcuNzMsMTUuNzItMjkuMSwzMS4yOC0zNC4wNywxNi4wNi01LjE0LDQ3LjgyLTcuNzksOTUuMDgtNy43OSw0Mi4yNCwwLDcyLjksMS4zNyw5Mi4wMSw0LDE0LjUyLDEuOTUsMjYuMjgsNy41MywzNS4yMSwxNi43Miw5LjYxLDkuNzgsMTQuNTgsMjYuNzEsMTUuMDcsNTAuNzloLTMxLjEzYy0uMzItMTcuNjktMi43Ny0yOC42Ny03LjIyLTMzLjEtNS4wMi00Ljk5LTE3LjgyLTguMTctMzguNDMtOS42My0xNS41My0xLjA4LTM1LjY0LTEuNjctNjAuMzUtMS42Ny0zMS42NCwwLTU0LjQ1Ljg1LTY4LjMxLDIuNTQtMTMuOTIsMS42Ny0yMy4xMyw0LjY0LTI3LjYyLDguOTEtNy40Myw3LjAzLTExLjA5LDMwLjczLTExLjA5LDcwLjk2LDAsMzQuMjQsMS4zNiw1Ni40Miw0LjExLDY2LjcsMy4xMywxMS4zNiwxMS40NywxOC4xMSwyNS4xOCwyMC4zMiwxNC42OSwyLjMzLDQ2Ljk4LDMuNDcsOTYuOSwzLjQ3LDI4LjE1LDAsNDcuODItLjk3LDU5LjA2LTIuODEsMTMuMjUtMi4zMywyMS40OC02LjgzLDI0LjcyLTEzLjQ4LDMuMjYtNi42OSw1LjA4LTIxLjY5LDUuMzgtNDUuMWgtMTE3Ljc2di0yNi40NVoiLz4KICA8cG9seWdvbiBwb2ludHM9IjY1NDcuNyA5MzMuOTcgNjU0Ny43IDcwOC4xMSA2NzY4Ljk5IDcwOC4xMSA2NzY4Ljk5IDczNC41OSA2NTc3Ljc3IDczNC41OSA2NTc3Ljc3IDgwMy42MyA2NzYwLjk0IDgwMy42MyA2NzYwLjk0IDgzMC4wNyA2NTc3Ljc3IDgzMC4wNyA2NTc3Ljc3IDkwNy40NyA2NzY5LjE2IDkwNy40NyA2NzY5LjE2IDkzMy45NyA2NTQ3LjcgOTMzLjk3Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSI2ODE2LjA4IDcwOC4xIDY4NzYuMjggNzA4LjEgNjk5OC44NSA4OTkuNTEgNzExOS4zOSA3MDguMSA3MTc5Ljk3IDcwOC4xIDcxNzkuOTcgOTMzLjk2IDcxNDkuODYgOTMzLjk2IDcxNDkuODYgNzM2LjA2IDcxMzcuMzEgNzM2LjA2IDcwMTEuMjMgOTMzLjk2IDY5ODYuNzUgOTMzLjk2IDY4NTkuNDIgNzM2LjA2IDY4NDYuMTkgNzM2LjA2IDY4NDYuMTkgOTMzLjk2IDY4MTYuMDggOTMzLjk2IDY4MTYuMDggNzA4LjEiLz4KICA8cG9seWdvbiBwb2ludHM9IjcyMzkuMTIgOTMzLjk3IDcyMzkuMTIgNzA4LjExIDc0NjAuNDUgNzA4LjExIDc0NjAuNDUgNzM0LjU5IDcyNjkuMjMgNzM0LjU5IDcyNjkuMjMgODAzLjYzIDc0NTIuMyA4MDMuNjMgNzQ1Mi4zIDgzMC4wNyA3MjY5LjIzIDgzMC4wNyA3MjY5LjIzIDkwNy40NyA3NDYwLjYgOTA3LjQ3IDc0NjAuNiA5MzMuOTcgNzIzOS4xMiA5MzMuOTciLz4KICA8cG9seWdvbiBwb2ludHM9Ijc1MDcuNDcgNzA4LjEgNzU1Ny41OCA3MDguMSA3NzU1LjQgOTA2LjE3IDc3NjIuNDQgOTA2LjE3IDc3NjIuNDQgNzA4LjEgNzc5Mi41NCA3MDguMSA3NzkyLjU0IDkzMy45NiA3NzQxLjUyIDkzMy45NiA3NTQ0LjIxIDczNi40NCA3NTM3LjYgNzM2LjQ0IDc1MzcuNiA5MzMuOTYgNzUwNy40NyA5MzMuOTYgNzUwNy40NyA3MDguMSIvPgogIDxwb2x5Z29uIHBvaW50cz0iNzgzNC45NCA3MDguMTEgNzgzNC45NCA3MzQuNjEgNzk0OC4zOCA3MzQuNjEgNzk0OC4zOCA5MzMuOTcgNzk3OC40OCA5MzMuOTcgNzk3OC40OCA3MzQuNjEgODA5MS40NCA3MzQuNjEgODA5MS40NCA3MDguMTEgNzgzNC45NCA3MDguMTEiLz4KICA8cG9seWdvbiBwb2ludHM9IjQwMS44OSAyODQuMTIgODI3LjAxIDI4NC4xMiA4MjcuMDEgMzcwLjcgNTExLjA5IDM3MC43IDUxMS4wOSA1MzAuMDUgODA5Ljg3IDUzMC4wNSA4MDkuODcgNjE2LjY0IDUxMS4wOSA2MTYuNjQgNTExLjA5IDg2MS43MSA0MDEuODkgODYxLjcxIDQwMS44OSAyODQuMTIiLz4KICA8cmVjdCB4PSI5NDYuMjMiIHk9IjI4NC4xIiB3aWR0aD0iMTA5LjE3IiBoZWlnaHQ9IjU3Ny41OSIvPgogIDxwYXRoIGQ9Ik0xMTk0LjQ1LDg2MS43MVYyODQuMTFoMTM1LjIybDE3OS4wNSwyNDcuNjZjNDYuMzQsNjQuMzEsODYuNDUsMTMxLjEsMTE4LjM0LDE5My42OWgyLjAzYy04LjI3LTc3LjAzLTExLjI4LTE1MS42NS0xMS4yOC0yMzkuODd2LTIwMS40OGgxMDguMzl2NTc3LjU5aC0xMjEuNzRsLTE4MS4xNy0yNTMuNjJjLTQ0LjIxLTYzLjQ0LTkwLjUxLTEzNC41LTEyNC41MS0xOTkuNjhsLTMuMDcuODVjNS4xMiw3NC41OSw2LjA3LDE1MC43NCw2LjA3LDI0NS44OHYyMDYuNTZoLTEwNy4zM1oiLz4KICA8cG9seWdvbiBwb2ludHM9IjIyNjAuNDEgNjE3LjYxIDE5NjEuNjMgNjE3LjYxIDE5NjEuNjMgNzc2LjE1IDIyNzcuNTkgNzc1LjAxIDIyNzcuNTkgODYyLjY4IDE4NTIuNDMgODYyLjY4IDE4NTIuNDMgMjg0Ljk3IDIyNzcuNTkgMjg0Ljk3IDIyNzcuNTkgMzcxLjY3IDE5NjEuNjMgMzcxLjY3IDE5NjEuNjMgNTMwLjg2IDIyNjAuNDEgNTMwLjg2IDIyNjAuNDEgNjE3LjYxIi8+CiAgPHBhdGggZD0iTTMzMTEuOTIsNzgzLjA1Yy0xMjYuMzQsMC0yMjguNzYtNjYuNDctMjI4Ljc2LTIxMS4xNXMxMDIuNDItMjExLjA5LDIyOC43Ni0yMTEuMDksMjI4LjYzLDk0LjQ5LDIyOC42MywyMTEuMDktMTAyLjM2LDIxMS4xNS0yMjguNjMsMjExLjE1TTMzMTEuOTIsMjcyLjU0Yy0xODYuNjMsMC0zMzcuOTEsMTEyLjUtMzM3LjkxLDI5OS4zN3MxNTEuMjgsMjk5LjQyLDMzNy45MSwyOTkuNDIsMzM3LjgtMTM0LjA4LDMzNy44LTI5OS40Mi0xNTEuMjYtMjk5LjM3LTMzNy44LTI5OS4zNyIvPgogIDxwYXRoIGQ9Ik0yODg5LjM5LDc2MS41OWMtMzkuMDYsMTMuNTctODIuOTUsMjEuMi0xMjkuNDIsMjEuMi0xNjMuMDMsMC0yOTUuMi02Ni4wOS0yOTUuMi0yMDkuOXMxMzIuMTctMjA5LjkyLDI5NS4yLTIwOS45MmM0Ny41NywwLDkyLjUsOC4wNiwxMzIuMywyMi4zbDI2LjMyLTg3Ljg0Yy00OC43My0xNS40My0xMDIuMzQtMjMuOTYtMTU4LjYxLTIzLjk2LTIyMy4zMiwwLTQwNC4zNCwxMTIuNi00MDQuMzQsMjk5LjQyLDAsMjA1Ljc1LDE1NS41LDI5OS40Miw0MDQuMzQsMjk5LjQyLDU1LjIzLDAsMTA3Ljc1LTguMjMsMTU1LjY5LTIzLjA0bC0yNi4yOC04Ny42OVoiLz4KICA8cGF0aCBkPSJNMzA2LjM4LDUzLjgyYy0xNDAuNTEsMC0yNTQuODEsMTE0LjM0LTI1NC44MSwyNTQuODV2NTI5LjgzYzAsMTQwLjUzLDExNC4zMSwyNTQuODUsMjU0LjgxLDI1NC44NWgzMzg3LjZjMTQwLjQ5LDAsMjU0LjgxLTExNC4zMiwyNTQuODEtMjU0Ljg1VjMwOC42N2MwLTE0MC41MS0xMTQuMzItMjU0Ljg1LTI1NC44MS0yNTQuODVIMzA2LjM4Wk0zNjkzLjk4LDExNDQuOTZIMzA2LjM4QzEzNy40LDExNDQuOTYsMCwxMDA3LjQ3LDAsODM4LjVWMzA4LjY3QzAsMTM5LjcsMTM3LjQsMi4yMSwzMDYuMzgsMi4yMWgzMzg3LjZjMTY4Ljk1LDAsMzA2LjM0LDEzNy40OSwzMDYuMzQsMzA2LjQ2djUyOS44M2MwLDE2OC45Ni0xMzcuNCwzMDYuNDYtMzA2LjM0LDMwNi40NiIvPgo8L3N2Zz4=" alt="Fineco Asset Management" style="height:28px;margin-bottom:6px;" /><h1>FAM ELTIF Private Equity Fund</h1><p>Rassegna stampa e Spunti commerciali</p></div><div class="hdr-r"><div>${date}</div><div class="edition">Edizione Bisettimanale</div></div></div>
+<div class="sec"><div class="sec-t">📰 Rassegna Stampa</div>${stampaHtml}</div>
+<div class="sec"><div class="sec-t">📊 Numeri che Fanno Parlare</div><div class="grid">${numeriHtml}</div></div>
+<div class="sec"><div class="sec-t">✨ Curiosità</div><div class="grid">${saveviHtml}</div></div>
+<div class="footer">Documento riservato — Fineco Asset Management · Uso interno · ${date}</div>
+</div><script>window.onload=function(){window.print();}<\/script></body></html>`;
+
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `FAM-ELTIF-Spunti-${new Date().toISOString().slice(0,10)}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
